@@ -15,14 +15,14 @@ class PortfolioManager:
     
     def load_data(self):
         if os.path.exists(self.holdings_path):
-            self.holdings = pd.read_csv(self.holdings_path)
+            self.holdings = pd.read_csv(self.holdings_path, encoding='utf-8-sig')
             if 'total_cost' not in self.holdings.columns:
                 self.holdings['total_cost'] = self.holdings['shares'] * self.holdings['cost_price']
         else:
             self.holdings = pd.DataFrame(columns=['stock_name', 'shares', 'cost_price', 'total_cost'])
         
         if os.path.exists(self.transactions_path):
-            self.transactions = pd.read_csv(self.transactions_path)
+            self.transactions = pd.read_csv(self.transactions_path, encoding='utf-8-sig')
             if 'cash_flow' not in self.transactions.columns:
                 self.transactions['cash_flow'] = 0.0
             if not self.transactions.empty:
@@ -31,16 +31,16 @@ class PortfolioManager:
             self.transactions = pd.DataFrame(columns=['date', 'type', 'stock_name', 'price', 'shares', 'cash_flow'])
         
         if os.path.exists(self.dividends_path):
-            self.dividends = pd.read_csv(self.dividends_path)
+            self.dividends = pd.read_csv(self.dividends_path, encoding='utf-8-sig')
             if not self.dividends.empty:
                 self.dividends['date'] = pd.to_datetime(self.dividends['date'])
         else:
             self.dividends = pd.DataFrame(columns=['date', 'stock_name', 'dividend_per_share'])
     
     def save_data(self):
-        self.holdings.to_csv(self.holdings_path, index=False)
-        self.transactions.to_csv(self.transactions_path, index=False)
-        self.dividends.to_csv(self.dividends_path, index=False)
+        self.holdings.to_csv(self.holdings_path, index=False, encoding='utf-8-sig')
+        self.transactions.to_csv(self.transactions_path, index=False, encoding='utf-8-sig')
+        self.dividends.to_csv(self.dividends_path, index=False, encoding='utf-8-sig')
     
     def add_transaction(self, date, type_, stock_name, price, shares):
         date = pd.to_datetime(date)
