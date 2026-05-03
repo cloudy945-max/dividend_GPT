@@ -1,3 +1,4 @@
-stock_name,shares,cost_price
-贵州茅台,150,1783.3333333333333
-招商银行,300,35
+﻿stock_name,shares,cost_price,total_cost
+双汇发展,200,24.43,4886.0
+兴业银行,300,18.28,5484.0
+工商银行,300,7.48,2244.0
