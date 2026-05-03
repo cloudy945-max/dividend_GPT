@@ -58,10 +58,51 @@ TARGET_WEIGHTS = {
 MIN_DEVIATION_TO_BUY = 0.02  # 偏离度阈值：低于此值才允许ETF补仓
 
 _market_df_cache = None
-_last_update_time = None
-CACHE_TTL = 60
+_etf_df_cache = None
+_last_update_date = None  # 记录缓存更新日期，格式：YYYY-MM-DD
+CLOSE_TIME = 15  # 收盘时间：下午3点
+
 cash_pool = 0.0
 MAX_CASH_POOL = 6000  # 最大资金池：2个月预算
+
+
+def need_refresh():
+    """判断是否需要刷新数据"""
+    global _last_update_date
+    
+    now = pd.Timestamp.now()
+    today = now.strftime('%Y-%m-%d')
+    current_hour = now.hour
+    
+    if _last_update_date is None:
+        return True
+    
+    if current_hour >= CLOSE_TIME and _last_update_date != today:
+        return True
+    
+    return False
+
+
+def clear_cache():
+    """手动清除缓存"""
+    global _market_df_cache, _etf_df_cache, _last_update_date
+    _market_df_cache = None
+    _etf_df_cache = None
+    _last_update_date = None
+
+
+def set_market_cache(df):
+    """设置A股市场数据缓存"""
+    global _market_df_cache, _last_update_date
+    _market_df_cache = df
+    _last_update_date = pd.Timestamp.now().strftime('%Y-%m-%d')
+
+
+def set_etf_cache(df):
+    """设置ETF数据缓存"""
+    global _etf_df_cache, _last_update_date
+    _etf_df_cache = df
+    _last_update_date = pd.Timestamp.now().strftime('%Y-%m-%d')
 
 
 def get_stock_name(stock_code):
@@ -656,7 +697,7 @@ def get_market_data(stock_code: str) -> dict:
             "pb": pb
         }
     """
-    global _market_df_cache, _last_update_time
+    global _market_df_cache, _etf_df_cache
 
     stock_code = get_stock_code(stock_code)
 
@@ -665,8 +706,14 @@ def get_market_data(stock_code: str) -> dict:
 
     try:
         if stock_code == "159307":
-            print(f"正在获取ETF数据: {stock_code}")
-            df = ak.fund_etf_spot_em()
+            if _etf_df_cache is None or need_refresh():
+                print(f"刷新ETF数据缓存: {stock_code}")
+                _etf_df_cache = ak.fund_etf_spot_em()
+                set_etf_cache(_etf_df_cache)
+            else:
+                print(f"使用缓存的ETF数据: {stock_code}")
+
+            df = _etf_df_cache
 
             if df is None or df.empty:
                 raise ValueError("ETF数据获取失败或为空")
@@ -702,12 +749,10 @@ def get_market_data(stock_code: str) -> dict:
                 "pb": None
             }
         else:
-            current_time = time.time()
-
-            if _market_df_cache is None or _last_update_time is None or (current_time - _last_update_time) > CACHE_TTL:
+            if _market_df_cache is None or need_refresh():
                 print("刷新市场数据缓存")
                 _market_df_cache = ak.stock_zh_a_spot_em()
-                _last_update_time = current_time
+                set_market_cache(_market_df_cache)
 
             if _market_df_cache is None or _market_df_cache.empty:
                 raise ValueError("市场数据获取失败或为空")
@@ -753,12 +798,6 @@ def get_market_data(stock_code: str) -> dict:
     except Exception as e:
         print(f"获取数据失败: {e}")
         return None
-
-
-def clear_cache():
-    global _market_df_cache, _last_update_time
-    _market_df_cache = None
-    _last_update_time = None
 
 
 def get_multiple_market_data(stock_list: list) -> list:
