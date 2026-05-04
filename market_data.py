@@ -286,13 +286,14 @@ def allocate_with_etf(plan, snapshot, monthly_budget, cash_pool_amount, strong_b
 
 def calculate_rebalance_buys(snapshot, current_holdings, total_budget, target_weights, strong_buy=None):
     """
-    基于偏离度优先级的再平衡买入函数（增强健壮性版本）
+    基于贪心补缺口算法的再平衡买入函数
 
-    健壮性增强：
-    1. snapshot 中如果 price 为 None：禁止进入任何买入逻辑
-    2. current_holdings 允许缺失某些股票，自动补0
-    3. 增加日志：打印未参与计算的标的
-    4. 所有计算前统一做：price_map过滤
+    步骤：
+    1. 计算每个资产的"缺口"：gap = target_value - current_value
+    2. 过滤：只保留 gap > 0 的资产
+    3. 按 gap 从大到小排序（最缺的优先）
+    4. 遍历排序后的资产，贪心买入尽可能多的整手（100股）
+    5. 强买标的优先级 +1
 
     Args:
         snapshot: 市场数据列表
@@ -304,7 +305,6 @@ def calculate_rebalance_buys(snapshot, current_holdings, total_budget, target_we
     Returns:
         {"buys": actions, "cash_left": 剩余现金}
     """
-    # 统一过滤：只保留有有效价格的数据
     price_map = {}
     for s in snapshot:
         stock_code = s.get("stock_code")
@@ -312,7 +312,6 @@ def calculate_rebalance_buys(snapshot, current_holdings, total_budget, target_we
         if stock_code and price is not None and price > 0:
             price_map[stock_code] = price
 
-    # 记录未参与计算的标的（价格无效）
     skipped_stocks = []
     for s in snapshot:
         stock_code = s.get("stock_code")
@@ -322,7 +321,6 @@ def calculate_rebalance_buys(snapshot, current_holdings, total_budget, target_we
     if skipped_stocks:
         print(f"  [警告] 以下标的因价格无效未参与计算: {', '.join(skipped_stocks)}")
 
-    # current_holdings 允许缺失，自动补0
     current_holdings = dict(current_holdings) if current_holdings else {}
     for stock_code in target_weights.keys():
         if stock_code not in current_holdings:
@@ -331,124 +329,81 @@ def calculate_rebalance_buys(snapshot, current_holdings, total_budget, target_we
     current_total = sum(current_holdings.values())
     plan_total = current_total + total_budget
 
-    # 检查是否有有效的股票可以交易
-    valid_stocks_for_buy = [code for code in target_weights.keys() if code in price_map]
-    if not valid_stocks_for_buy:
-        print(f"  [警告] 没有有效的标的可以交易（所有标的价格都无效）")
+    if plan_total <= 0:
         return {"buys": [], "cash_left": total_budget}
 
-    # 初始化偏离度
-    deviations = {}
+    gaps = []
     for stock_code in target_weights.keys():
+        if stock_code == "159307":
+            continue
+
         price = price_map.get(stock_code)
-        if price is None:
-            deviations[stock_code] = -float('inf')
+        if price is None or price <= 0:
             continue
 
         current_value = current_holdings.get(stock_code, 0.0)
         target_weight = target_weights[stock_code]
         target_value = plan_total * target_weight
-        deviation = target_weight - (current_value / plan_total if plan_total > 0 else 0)
-        deviations[stock_code] = deviation
+        gap = target_value - current_value
 
-    # 按偏离度排序（从大到小）
-    # 强买标的优先级提高（权重 *1.5）
-    sorted_stocks = []
-    for stock_code, deviation in deviations.items():
-        # 跳过价格无效的标的
-        if stock_code not in price_map:
-            continue
-        priority = 1.0
-        if stock_code == strong_buy:
-            priority = 1.5
-        effective_deviation = deviation * priority
-        sorted_stocks.append((stock_code, effective_deviation, deviation))
+        if gap > 0:
+            priority = 1.5 if stock_code == strong_buy else 1.0
+            effective_gap = gap * priority
+            gaps.append({
+                "stock_code": stock_code,
+                "gap": gap,
+                "effective_gap": effective_gap,
+                "price": price,
+                "target_weight": target_weight,
+                "current_value": current_value
+            })
 
-    sorted_stocks.sort(key=lambda x: x[1], reverse=True)
+    gaps.sort(key=lambda x: (x["current_value"] == 0, x["gap"]), reverse=True)
 
     buys = []
     cash_pool = total_budget
 
-    while cash_pool >= 100:
-        # 找到偏离度最大的股票
-        best_stock = None
-        best_deviation = -float('inf')
-        best_original_deviation = -float('inf')
+    for item in gaps:
+        stock_code = item["stock_code"]
+        price = item["price"]
 
-        for stock_code, effective_dev, original_dev in sorted_stocks:
-            # 双重检查：确保价格有效
-            price = price_map.get(stock_code)
-            if price is None or price <= 0:
-                continue
+        while cash_pool >= price * 100:
+            shares = 100
+            cost = shares * price
 
-            # 跳过ETF（ETF单独处理）
-            if stock_code == "159307":
-                continue
+            buys.append({
+                "stock_code": stock_code,
+                "stock_name": get_stock_name(stock_code),
+                "shares": shares,
+                "cost": cost,
+                "price": price,
+                "gap_before": item["gap"]
+            })
 
-            # 检查是否还能买（至少1手）
-            lot_cost = price * 100
-            if cash_pool < lot_cost:
-                continue
+            cash_pool -= cost
+            current_holdings[stock_code] = current_holdings.get(stock_code, 0.0) + cost
+            item["gap"] -= cost
 
-            if effective_dev > best_deviation:
-                best_stock = stock_code
-                best_deviation = effective_dev
-                best_original_deviation = original_dev
-
-        # 如果没有可买的股票，退出循环
-        if best_stock is None:
-            break
-
-        # 买入100股
-        price = price_map[best_stock]
-        shares = 100
-        cost = price * shares
-
-        buys.append({
-            "stock_code": best_stock,
-            "stock_name": get_stock_name(best_stock),
-            "shares": shares,
-            "cost": cost,
-            "price": price,
-            "deviation_before": best_original_deviation
-        })
-
-        # 更新状态
-        cash_pool -= cost
-        current_holdings[best_stock] = current_holdings.get(best_stock, 0.0) + cost
-
-        # 重新计算该标的的偏离度
-        target_weight = target_weights[best_stock]
-        target_value = plan_total * target_weight
-        new_deviation = target_weight - (current_holdings[best_stock] / plan_total if plan_total > 0 else 0)
-        deviations[best_stock] = new_deviation
-
-        # 更新排序
-        for i, (stock_code, effective_dev, original_dev) in enumerate(sorted_stocks):
-            if stock_code == best_stock:
-                priority = 1.5 if stock_code == strong_buy else 1.0
-                sorted_stocks[i] = (stock_code, new_deviation * priority, new_deviation)
+            if item["gap"] <= 0:
                 break
 
-        sorted_stocks.sort(key=lambda x: x[1], reverse=True)
-
-    # ETF买入规则：只有当所有股票 deviation < MIN_DEVIATION_TO_BUY 才允许买ETF
     etf_allowed = True
     for stock_code in target_weights.keys():
         if stock_code == "159307":
             continue
-        if deviations.get(stock_code, -float('inf')) >= MIN_DEVIATION_TO_BUY:
+        current_value = current_holdings.get(stock_code, 0.0)
+        target_weight = target_weights[stock_code]
+        target_value = plan_total * target_weight
+        deviation = target_weight - (current_value / plan_total if plan_total > 0 else 0)
+        if deviation >= MIN_DEVIATION_TO_BUY:
             etf_allowed = False
             break
 
-    # 处理ETF买入：最大化资金利用率
     if etf_allowed:
         etf_price = price_map.get("159307")
         if etf_price is not None and etf_price > 0:
-            # 尝试买入尽可能多的ETF（至少1手）
             min_lot_cost = etf_price * 100
             if cash_pool >= min_lot_cost:
-                # 计算最大可买手数
                 max_lots = int(cash_pool / min_lot_cost)
                 shares = max_lots * 100
                 cost = shares * etf_price
@@ -481,24 +436,26 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000, current_holding
     """
     global cash_pool
 
-    buy_list = plan.get("buy_list", [])
-    target_stock_code = buy_list[0].get("stock_code") if buy_list else None
-
     strong_buy_stock = None
-    if target_stock_code:
-        target_stock = None
-        for stock in snapshot:
-            if stock.get("stock_code") == target_stock_code:
-                target_stock = stock
-                break
+    strong_buy_pb = None
 
-        if target_stock:
-            pb = target_stock.get("pb")
-            if pb is not None:
-                if target_stock_code == "招商银行" and pb <= 0.85:
-                    strong_buy_stock = target_stock_code
-                elif (target_stock_code == "兴业银行" or target_stock_code == "工商银行") and pb <= 0.75:
-                    strong_buy_stock = target_stock_code
+    for stock in snapshot:
+        stock_code = stock.get("stock_code")
+        pb = stock.get("pb")
+
+        if pb is None:
+            continue
+
+        is_strong_buy = False
+        if stock_code == "招商银行" and pb <= 0.85:
+            is_strong_buy = True
+        elif stock_code in ["兴业银行", "工商银行"] and pb <= 0.75:
+            is_strong_buy = True
+
+        if is_strong_buy:
+            if strong_buy_stock is None or pb < strong_buy_pb:
+                strong_buy_stock = stock_code
+                strong_buy_pb = pb
 
     initial_cash_pool = cash_pool
 
@@ -508,11 +465,34 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000, current_holding
         total_budget = monthly_budget + cash_pool
         strong_buy_flag = True
 
+    has_candidate = bool(plan.get("buy_list"))
+
     stock_available = total_budget
+
+    strong_buy_buys = []
+    if strong_buy_stock:
+        for stock in snapshot:
+            if stock.get("stock_code") == strong_buy_stock:
+                price = stock.get("price")
+                if price and price > 0:
+                    max_lot = int(total_budget / (price * 100))
+                    if max_lot > 0:
+                        shares = max_lot * 100
+                        cost = shares * price
+                        strong_buy_buys.append({
+                            "stock_code": strong_buy_stock,
+                            "stock_name": get_stock_name(strong_buy_stock),
+                            "shares": shares,
+                            "cost": cost,
+                            "price": price,
+                            "is_strong_buy": True
+                        })
+                        total_budget -= cost
+                break
 
     use_rebalance = current_holdings is not None and isinstance(current_holdings, dict) and len(current_holdings) > 0
 
-    if use_rebalance:
+    if use_rebalance and any(current_holdings.get(k, 0) > 0 for k in current_holdings):
         rebalance_result = calculate_rebalance_buys(
             snapshot=snapshot,
             current_holdings=current_holdings,
@@ -549,13 +529,69 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000, current_holding
 
         cash_left = MAX_CASH_POOL + etf_allocation.get("cash_left", 0.0)
 
-    enhanced_actions = []
+    actions_dict = {}
     current_total = sum(current_holdings.values()) if current_holdings else 0.0
     plan_total = current_total + total_budget
 
+    for buy in strong_buy_buys:
+        stock_code = buy.get("stock_code")
+        stock_name = get_stock_name(stock_code)
+        shares = buy.get("shares", 0)
+        cost = buy.get("cost", 0)
+
+        if stock_name in actions_dict:
+            actions_dict[stock_name]["shares"] += shares
+            actions_dict[stock_name]["cost"] += cost
+        else:
+            actions_dict[stock_name] = {
+                "stock_code": stock_code,
+                "stock_name": stock_name,
+                "shares": shares,
+                "cost": cost,
+                "is_strong_buy": True
+            }
+
     for buy in total_buys:
         stock_code = buy.get("stock_code")
+        stock_name = get_stock_name(stock_code)
         shares = buy.get("shares", 0)
+        cost = buy.get("cost")
+
+        if stock_name in actions_dict:
+            actions_dict[stock_name]["shares"] += shares
+            actions_dict[stock_name]["cost"] += cost if cost else 0
+        else:
+            actions_dict[stock_name] = {
+                "stock_code": stock_code,
+                "stock_name": stock_name,
+                "shares": shares,
+                "cost": cost if cost else 0
+            }
+
+    for action in overflow_buys:
+        stock_code = action.get("stock_code")
+        stock_name = get_stock_name(stock_code)
+        shares = action.get("shares", 0)
+        cost = action.get("cost")
+
+        if stock_name in actions_dict:
+            actions_dict[stock_name]["shares"] += shares
+            actions_dict[stock_name]["cost"] += cost if cost else 0
+            actions_dict[stock_name]["is_overflow"] = True
+        else:
+            actions_dict[stock_name] = {
+                "stock_code": stock_code,
+                "stock_name": stock_name,
+                "shares": shares,
+                "cost": cost if cost else 0,
+                "is_overflow": True
+            }
+
+    enhanced_actions = []
+    for stock_name, action_data in actions_dict.items():
+        stock_code = action_data.get("stock_code")
+        shares = action_data.get("shares", 0)
+        cost = action_data.get("cost", 0)
 
         price = None
         for stock in snapshot:
@@ -563,18 +599,18 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000, current_holding
                 price = stock.get("price")
                 break
 
-        cost = buy.get("cost")
-        if price is not None and shares > 0 and cost is None:
+        if price is not None and shares > 0 and cost == 0:
             cost = price * shares
 
         current_value = current_holdings.get(stock_code, 0.0) if current_holdings else 0.0
         current_weight = current_value / plan_total if plan_total > 0 else 0.0
         target_weight = TARGET_WEIGHTS.get(stock_code, 0.0)
         deviation = target_weight - current_weight
+        is_overflow = action_data.get("is_overflow", False)
 
         enhanced_action = {
             "stock_code": stock_code,
-            "stock_name": get_stock_name(stock_code),
+            "stock_name": stock_name,
             "shares": shares,
             "price": price,
             "cost": cost,
@@ -582,44 +618,74 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000, current_holding
             "target_weight": target_weight,
             "deviation": deviation
         }
-        enhanced_actions.append(enhanced_action)
+        if is_overflow:
+            enhanced_action["is_overflow"] = True
 
-    for action in overflow_buys:
-        stock_code = action.get("stock_code")
-        shares = action.get("shares", 0)
+        if shares > 0:
+            enhanced_actions.append(enhanced_action)
 
-        price = None
+    if not enhanced_actions and cash_left > 0:
         for stock in snapshot:
-            if stock.get("stock_code") == stock_code:
-                price = stock.get("price")
+            if stock.get("stock_code") == "159307":
+                etf_price = stock.get("price")
+                if etf_price and etf_price > 0:
+                    fallback_result = calculate_buy_shares(etf_price, monthly_budget)
+                    if fallback_result["shares"] > 0:
+                        enhanced_actions.append({
+                            "stock_code": "159307",
+                            "stock_name": get_stock_name("159307"),
+                            "shares": fallback_result["shares"],
+                            "price": etf_price,
+                            "cost": fallback_result["shares"] * etf_price,
+                            "is_fallback_etf": True
+                        })
+                        cash_left = fallback_result["remaining_cash"]
                 break
-
-        cost = action.get("cost")
-        if price is not None and shares > 0 and cost is None:
-            cost = price * shares
-
-        current_value = current_holdings.get(stock_code, 0.0) if current_holdings else 0.0
-        current_weight = current_value / plan_total if plan_total > 0 else 0.0
-        target_weight = TARGET_WEIGHTS.get(stock_code, 0.0)
-        deviation = target_weight - current_weight
-
-        enhanced_action = {
-            "stock_code": stock_code,
-            "stock_name": get_stock_name(stock_code),
-            "shares": shares,
-            "price": price,
-            "cost": cost,
-            "current_weight": current_weight,
-            "target_weight": target_weight,
-            "deviation": deviation,
-            "is_overflow": True
-        }
-        enhanced_actions.append(enhanced_action)
 
     used_cash_pool = max(0, total_budget - monthly_budget)
 
     cash_pool = min(cash_left, MAX_CASH_POOL)
     remaining_cash_pool = cash_pool
+
+    can_afford_stock = False
+    for stock in snapshot:
+        stock_code = stock.get("stock_code")
+        if stock_code == "159307":
+            continue
+        price = stock.get("price")
+        if price is not None and price > 0:
+            if monthly_budget >= price * 100:
+                can_afford_stock = True
+                break
+
+    if len(enhanced_actions) == 0:
+        if can_afford_stock:
+            print("触发最终兜底：买入ETF")
+            etf_stock = None
+            for stock in snapshot:
+                if stock.get("stock_code") == "159307":
+                    etf_stock = stock
+                    break
+
+            if etf_stock and etf_stock.get("price") is not None:
+                etf_name = get_stock_name("159307")
+                fallback_buy = calculate_buy_shares(etf_stock["price"], monthly_budget)
+
+                if fallback_buy["shares"] > 0:
+                    enhanced_actions.append({
+                        "stock_code": "159307",
+                        "stock_name": etf_name,
+                        "shares": fallback_buy["shares"],
+                        "price": etf_stock["price"],
+                        "cost": fallback_buy["shares"] * etf_stock["price"],
+                        "current_weight": 0.0,
+                        "target_weight": TARGET_WEIGHTS.get("159307", 0.0),
+                        "deviation": TARGET_WEIGHTS.get("159307", 0.0),
+                        "is_fallback_etf": True
+                    })
+                    cash_left = fallback_buy["remaining_cash"]
+        else:
+            print("所有股票均无法买入（不足100股），保留现金")
 
     result = {
         "month_budget": monthly_budget,
