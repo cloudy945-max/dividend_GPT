@@ -6,6 +6,22 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from market_data import generate_execution_plan, TARGET_WEIGHTS, MIN_DEVIATION_TO_BUY
 
+STOCK_CODE_MAP = {
+    "招商银行": "600036",
+    "兴业银行": "601166",
+    "工商银行": "601398",
+    "双汇发展": "000895",
+    "159307": "159307"
+}
+
+STOCK_NAME_MAP = {
+    "600036": "招商银行",
+    "601166": "兴业银行",
+    "601398": "工商银行",
+    "000895": "双汇发展",
+    "159307": "红利低波100ETF"
+}
+
 
 TARGET_WEIGHTS_DEFAULT = {
     "兴业银行": 0.30,
@@ -263,3 +279,268 @@ class StrategyAdapter:
 
     def set_target_weights(self, weights):
         self.target_weights = weights.copy()
+
+
+def debug_backtest_step(history_data):
+    """
+    调试函数：验证历史数据 → 每日循环 → 策略决策 是否真实发生
+    """
+    import sys
+    sys.stdout.reconfigure(encoding='utf-8')
+    
+    if not history_data:
+        print("ERROR: history_data 为空")
+        return
+    
+    stock_list = list(history_data.keys())
+    if not stock_list:
+        print("ERROR: 没有股票数据")
+        return
+    
+    dates = set()
+    for stock_name in stock_list:
+        df = history_data[stock_name]
+        if df is not None and not df.empty:
+            dates.update(df['date'].head(5).tolist())
+    
+    dates = sorted(list(dates))[:5]
+    
+    strategy_adapter = StrategyAdapter()
+    
+    results = []
+    strategy_called = False
+    
+    pb_values = {
+        "招商银行": [0.9, 0.84, 0.86, 0.83, 0.87],
+        "兴业银行": [0.8, 0.76, 0.74, 0.77, 0.73],
+        "工商银行": [0.7, 0.71, 0.69, 0.72, 0.68],
+        "双汇发展": [None, None, None, None, None],
+        "159307": [None, None, None, None, None]
+    }
+    
+    for idx, date in enumerate(dates):
+        snapshot = []
+        prices = {}
+        
+        for stock_name in stock_list:
+            df = history_data[stock_name]
+            if df is None or df.empty:
+                continue
+            
+            mask = df['date'] == date
+            if not mask.any():
+                continue
+            
+            price = df[mask]['close'].iloc[0]
+            prices[stock_name] = price
+            
+            pbs = pb_values.get(stock_name, [None]*5)
+            pb = pbs[idx] if idx < len(pbs) else None
+            
+            snapshot.append({
+                'stock_code': stock_name,
+                'stock_name': stock_name,
+                'price': price,
+                'pb': pb,
+                'price_percentile': None,
+                'data_date': date
+            })
+        
+        if not snapshot:
+            continue
+        
+        current_holdings = {}
+        cash_pool = 0
+        monthly_budget = 3000
+        
+        try:
+            result = strategy_adapter.run_strategy(
+                snapshot=snapshot,
+                current_holdings=current_holdings,
+                cash_pool=cash_pool,
+                monthly_budget=monthly_budget
+            )
+            strategy_called = True
+            
+            actions = result.get("actions", [])
+            
+            strong_buy_stocks = []
+            for stock in snapshot:
+                stock_code = stock['stock_code']
+                if strategy_adapter.should_strong_buy(stock_code, snapshot):
+                    strong_buy_stocks.append(stock_code)
+            
+            results.append({
+                'date': date,
+                'prices': prices,
+                'pbs': {s['stock_code']: s['pb'] for s in snapshot},
+                'strong_buy': strong_buy_stocks,
+                'actions': actions
+            })
+            
+        except Exception as e:
+            print(f"日期 {date}: 策略执行失败 - {e}")
+            results.append({
+                'date': date,
+                'prices': prices,
+                'strong_buy': [],
+                'actions': []
+            })
+    
+    if not strategy_called:
+        print("⚠️ 未触发任何策略逻辑")
+        return
+    
+    all_same = len(set(str(len(r['strong_buy'])) for r in results)) <= 1 and \
+               len(set(str(len(r['actions']) > 0) for r in results)) <= 1
+    
+    for result in results:
+        print(f"\n日期: {result['date']}")
+        for stock_name, price in result['prices'].items():
+            pb = result['pbs'].get(stock_name)
+            pb_str = f", PB={pb}" if pb is not None else ""
+            print(f"  {stock_name}: {price:.2f}{pb_str}")
+        print(f"strong_buy: {result['strong_buy']}")
+        
+        if result['actions']:
+            for action in result['actions']:
+                stock = action.get('stock_name', action.get('stock_code', 'unknown'))
+                shares = action.get('shares', 0)
+                print(f"action: 买入 {stock} {shares}股")
+        else:
+            print(f"action: None")
+    
+    if all_same:
+        print("\n⚠️ 策略未使用历史数据（可能写死了）")
+    else:
+        print("\n✅ 策略随价格/PB变化产生不同决策")
+
+
+def run_backtest(history_data, monthly_budget=3000):
+    """
+    真正的回测主循环：完整资金演化系统
+    """
+    import sys
+    sys.stdout.reconfigure(encoding='utf-8')
+    
+    if not history_data:
+        print("ERROR: history_data 为空")
+        return None
+    
+    all_dates = set()
+    for stock_name, df in history_data.items():
+        if df is not None and not df.empty:
+            all_dates.update(df['date'].tolist())
+    
+    if not all_dates:
+        print("ERROR: 没有日期数据")
+        return None
+    
+    sorted_dates = sorted(all_dates)
+    
+    cash = 0.0
+    holdings = {}
+    history = []
+    
+    strategy_adapter = StrategyAdapter()
+    
+    prev_month = None
+    
+    for idx, date in enumerate(sorted_dates):
+        snapshot = []
+        price_map = {}
+        
+        print(f"\n{'='*50}")
+        print(f"当前日期: {date}")
+        
+        for stock_name, df in history_data.items():
+            if df is None or df.empty:
+                continue
+            
+            mask = df['date'] == date
+            if not mask.any():
+                continue
+            
+            price = df[mask]['close'].iloc[0]
+            
+            stock_code = STOCK_CODE_MAP.get(stock_name, stock_name)
+            normalized_name = STOCK_NAME_MAP.get(stock_code, stock_name)
+            
+            price_map[normalized_name] = price
+            
+            snapshot.append({
+                'stock_code': stock_code,
+                'stock_name': normalized_name,
+                'price': price,
+                'pb': None,
+                'price_percentile': None,
+                'data_date': date
+            })
+        
+        if not snapshot:
+            continue
+        
+        current_month = date.month
+        is_new_month = (prev_month is None) or (current_month != prev_month)
+        
+        print(f"是否新月: {is_new_month}")
+        
+        if is_new_month:
+            print(f"=== 执行月度策略 ===")
+            cash += monthly_budget
+            print(f"现金加预算: {cash}")
+            
+            holdings_value = 0.0
+            current_holdings_market_value = {}
+            for stock_name, shares in holdings.items():
+                price = price_map.get(stock_name, 0)
+                value = shares * price
+                holdings_value += value
+                current_holdings_market_value[stock_name] = value
+            
+            try:
+                result = strategy_adapter.run_strategy(
+                    snapshot=snapshot,
+                    current_holdings=current_holdings_market_value,
+                    cash_pool=0,
+                    monthly_budget=cash
+                )
+                
+                actions = result.get("actions", [])
+                print(f"策略返回 actions 数: {len(actions)}")
+                
+                for action in actions:
+                    stock_name = action.get('stock_name') or action.get('stock_code')
+                    shares = action.get('shares', 0)
+                    price = action.get('price') or price_map.get(stock_name, 0)
+                    cost = shares * price
+                    
+                    if stock_name and shares > 0 and cash >= cost:
+                        cash -= cost
+                        if stock_name in holdings:
+                            holdings[stock_name] += shares
+                        else:
+                            holdings[stock_name] = shares
+                        print(f"买入: {stock_name} {shares}股 @ {price} = {cost}")
+                    else:
+                        print(f"跳过: {stock_name} {shares}股, cash={cash}")
+                
+            except Exception as e:
+                print(f"策略执行失败: {e}")
+            
+            prev_month = current_month
+        
+        holdings_value = sum(holdings.get(s, 0) * price_map.get(s, 0) for s in holdings)
+        total_value = cash + holdings_value
+        
+        print(f"当日总市值: {total_value} (cash={cash}, holdings={holdings_value})")
+        
+        history.append({
+            'date': date,
+            'cash': cash,
+            'holdings_value': holdings_value,
+            'total_value': total_value,
+            'holdings': dict(holdings)
+        })
+    
+    return history

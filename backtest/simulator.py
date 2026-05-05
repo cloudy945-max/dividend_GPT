@@ -230,12 +230,21 @@ class BacktestEngine:
                 monthly_budget=monthly_budget
             )
 
-            self._execute_actions(strategy_result.get('actions', []), price_map)
+            actions = strategy_result.get('actions', [])
+            self._execute_actions(actions, price_map)
 
             self.cash_pool = strategy_result.get('cash_pool', self.cash_pool)
 
             holdings_value = self._calculate_holdings_market_value(price_map)
             total_value = self.cash + self.cash_pool + holdings_value
+
+            print(f"\n==== {month_date} ====")
+            print(f"总资产: {total_value:.2f}")
+            print(f"现金: {self.cash:.2f}")
+            print("本月操作:")
+            for action in actions:
+                print(action)
+            print("------")
 
             self.history.append({
                 'date': month_date,

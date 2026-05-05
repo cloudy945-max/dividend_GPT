@@ -97,7 +97,12 @@ class BacktestDataLoader:
     def _load_stock_historical(self, stock_code, start_date, end_date):
         try:
             symbol = STOCK_CODE_MAP.get(stock_code, stock_code)
-            df = ak.stock_zh_a_hist(symbol=symbol, start_date=start_date, end_date=end_date, adjust="qfq")
+            
+            # 转换日期格式: YYYY-MM-DD -> YYYYMMDD
+            start_date_fmt = start_date.replace('-', '')
+            end_date_fmt = end_date.replace('-', '')
+            
+            df = ak.stock_zh_a_hist(symbol=symbol, start_date=start_date_fmt, end_date=end_date_fmt, adjust="qfq")
             if df is not None and not df.empty:
                 df = df.rename(columns={
                     '日期': 'date',
@@ -111,14 +116,16 @@ class BacktestDataLoader:
 
     def _load_etf_historical(self, stock_code, start_date, end_date):
         try:
-            df = ak.fund_etf_hist_em(symbol=stock_code, start_date=start_date, end_date=end_date)
+            df = ak.fund_etf_hist_em(symbol=stock_code)
             if df is not None and not df.empty:
                 df = df.rename(columns={
                     '日期': 'date',
                     '收盘': 'close'
                 })
                 df['date'] = pd.to_datetime(df['date'])
-                return df[['date', 'close']]
+                df = df[['date', 'close']].copy()
+                df = df[(df['date'] >= pd.to_datetime(start_date)) & (df['date'] <= pd.to_datetime(end_date))]
+                return df
         except Exception as e:
             print(f"加载ETF历史数据失败 {stock_code}: {e}")
         return None

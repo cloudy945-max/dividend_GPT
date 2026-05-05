@@ -63,7 +63,9 @@ _last_update_date = None  # 记录缓存更新日期，格式：YYYY-MM-DD
 CLOSE_TIME = 15  # 收盘时间：下午3点
 
 cash_pool = 0.0
-MAX_CASH_POOL = 6000  # 最大资金池：2个月预算
+# MAX_CASH_POOL = 6000  # 最大资金池：2个月预算（已废弃，改用动态计算）
+tracking_months_no_stock = 0  # 连续无股票成交月份计数器
+MONTHS_TO_ALLOW_ETF = 6  # MODIFIED: 连续6个月无股票成交后允许ETF兜底
 
 
 def need_refresh():
@@ -190,6 +192,9 @@ def execute_single_buy(stock, budget):
 
 
 def allocate_with_etf(plan, snapshot, monthly_budget, cash_pool_amount, strong_buy):
+    # MODIFIED: 动态计算MAX_CASH_POOL
+    MAX_CASH_POOL = monthly_budget * 4
+    
     actions_dict = {}
 
     if strong_buy:
@@ -201,6 +206,8 @@ def allocate_with_etf(plan, snapshot, monthly_budget, cash_pool_amount, strong_b
 
     buy_list = plan.get("buy_list", [])
     target_stock_code = buy_list[0].get("stock_code") if buy_list else None
+    
+    print(f"[DEBUG] allocate_with_etf: buy_list={buy_list}, target_stock_code={target_stock_code}")
 
     etf_stock = None
     for stock in snapshot:
@@ -250,26 +257,65 @@ def allocate_with_etf(plan, snapshot, monthly_budget, cash_pool_amount, strong_b
     if not skip_etf_buy:
         monthly_spent = min(stock_spent, monthly_budget)
         monthly_remaining = max(0, monthly_budget - monthly_spent)
+        
+        print(f"[DEBUG] monthly_spent={monthly_spent}, monthly_remaining={monthly_remaining}")
 
         if monthly_remaining > 800:
-            if etf_stock and etf_stock.get("price") is not None:
-                etf_buy = calculate_buy_shares(etf_stock.get("price"), monthly_remaining)
-                if etf_buy.get("shares", 0) > 0:
-                    shares = etf_buy.get("shares", 0)
-                    if "159307" in actions_dict:
-                        actions_dict["159307"] += shares
-                    else:
-                        actions_dict["159307"] = shares
-                    etf_cost = monthly_remaining - etf_buy["remaining_cash"]
-                    etf_spent += etf_cost
-                    cash_left -= monthly_remaining
-                    cash_left += etf_buy["remaining_cash"]
+            allow_etf = False
+            
+            # MODIFIED: 增加ETF决策调试输出
+            print("====== ETF 决策调试 ======")
+            print(f"cash_pool: {cash_pool_amount}")
+            print(f"monthly_budget: {monthly_budget}")
+            print(f"tracking_months_no_stock: {tracking_months_no_stock}")
+            print(f"MONTHS_TO_ALLOW_ETF: {MONTHS_TO_ALLOW_ETF}")
+            print(f"MAX_CASH_POOL: {MAX_CASH_POOL}")
+            print(f"条件A(cash_pool>=MAX): {cash_pool_amount >= MAX_CASH_POOL}")
+            print(f"条件B(月数>=阈值): {tracking_months_no_stock >= MONTHS_TO_ALLOW_ETF}")
+            
+            # MODIFIED: 只有在buy_list为空时才允许ETF
+            if buy_list:
+                allow_etf = False
+                print("  禁止ETF：有候选股票待买")
+            elif stock_spent > 0:
+                allow_etf = True
+                print("  允许ETF：已有股票买入")
+            else:
+                if cash_pool_amount >= MAX_CASH_POOL:
+                    allow_etf = True
+                    print(f"  允许ETF：cash_pool >= MAX_CASH_POOL ({cash_pool_amount} >= {MAX_CASH_POOL})")
+                elif tracking_months_no_stock >= MONTHS_TO_ALLOW_ETF:
+                    allow_etf = True
+                    print(f"  允许ETF：连续{tracking_months_no_stock}个月无股票成交 >= {MONTHS_TO_ALLOW_ETF}个月")
+                else:
+                    print(f"  不允许ETF：条件未满足")
+            
+            print(f"[DEBUG] allow_etf={allow_etf}")
+            
+            if allow_etf:
+                if etf_stock and etf_stock.get("price") is not None:
+                    # MODIFIED: ETF买入使用资金 = min(monthly_budget, cash_pool)
+                    etf_budget = min(monthly_remaining, monthly_budget)
+                    etf_buy = calculate_buy_shares(etf_stock.get("price"), etf_budget)
+                    if etf_buy.get("shares", 0) > 0:
+                        shares = etf_buy.get("shares", 0)
+                        if "159307" in actions_dict:
+                            actions_dict["159307"] += shares
+                        else:
+                            actions_dict["159307"] = shares
+                        etf_cost = etf_budget - etf_buy["remaining_cash"]
+                        etf_spent += etf_cost
+                        cash_left -= etf_budget
+                        cash_left += etf_buy["remaining_cash"]
+            
+            # TODO: 如果未来出现 strong_buy 机会，考虑卖出ETF换仓股票（ETF -> 股票切换机制）
 
     actions = []
     for stock_code, shares in actions_dict.items():
         actions.append({
             "stock_code": stock_code,
-            "stock_name": get_stock_name(stock_code)
+            "stock_name": get_stock_name(stock_code),
+            "shares": shares
         })
 
     total_input = monthly_budget + (cash_pool_amount if strong_buy else 0)
@@ -277,6 +323,8 @@ def allocate_with_etf(plan, snapshot, monthly_budget, cash_pool_amount, strong_b
     if abs(total_input - total_output) > 1:
         print(f"警告：现金流不平衡！输入: {total_input:.2f}, 输出: {total_output:.2f}")
 
+    print(f"[DEBUG] allocate_with_etf returning {len(actions)} actions: {[a.get('stock_code') for a in actions]}")
+    
     return {
         "actions": actions,
         "cash_left": float(cash_left),
@@ -434,7 +482,7 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000, current_holding
         monthly_budget: 月度预算
         current_holdings: 当前持仓市值字典（key为stock_code）
     """
-    global cash_pool
+    global cash_pool, tracking_months_no_stock
 
     strong_buy_stock = None
     strong_buy_pb = None
@@ -492,6 +540,8 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000, current_holding
 
     use_rebalance = current_holdings is not None and isinstance(current_holdings, dict) and len(current_holdings) > 0
 
+    MAX_CASH_POOL = monthly_budget * 4  # MODIFIED: 动态计算
+
     if use_rebalance and any(current_holdings.get(k, 0) > 0 for k in current_holdings):
         rebalance_result = calculate_rebalance_buys(
             snapshot=snapshot,
@@ -508,6 +558,8 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000, current_holding
         cash_left = allocation.get("cash_left", 0.0)
         total_buys = allocation.get("actions", [])
         stock_spent = allocation.get("stock_spent", 0.0)
+        
+        print(f"[DEBUG] total_buys from allocate_with_etf: {len(total_buys)} actions")
 
     overflow_buys = []
     if cash_left > MAX_CASH_POOL:
@@ -624,28 +676,25 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000, current_holding
         if shares > 0:
             enhanced_actions.append(enhanced_action)
 
-    if not enhanced_actions and cash_left > 0:
-        for stock in snapshot:
-            if stock.get("stock_code") == "159307":
-                etf_price = stock.get("price")
-                if etf_price and etf_price > 0:
-                    fallback_result = calculate_buy_shares(etf_price, monthly_budget)
-                    if fallback_result["shares"] > 0:
-                        enhanced_actions.append({
-                            "stock_code": "159307",
-                            "stock_name": get_stock_name("159307"),
-                            "shares": fallback_result["shares"],
-                            "price": etf_price,
-                            "cost": fallback_result["shares"] * etf_price,
-                            "is_fallback_etf": True
-                        })
-                        cash_left = fallback_result["remaining_cash"]
-                break
-
     used_cash_pool = max(0, total_budget - monthly_budget)
 
-    cash_pool = min(cash_left, MAX_CASH_POOL)
+    total_spent = total_budget - cash_left
+    if total_spent > 0:
+        cash_pool = max(0, initial_cash_pool - used_cash_pool)
+    else:
+        cash_pool = min(initial_cash_pool + monthly_budget, MAX_CASH_POOL)
     remaining_cash_pool = cash_pool
+
+    has_stock_action = False
+    for action in enhanced_actions:
+        if action.get("stock_code") != "159307":
+            has_stock_action = True
+            break
+
+    if has_stock_action:
+        tracking_months_no_stock = 0
+    else:
+        tracking_months_no_stock += 1
 
     can_afford_stock = False
     for stock in snapshot:
@@ -659,8 +708,31 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000, current_holding
                 break
 
     if len(enhanced_actions) == 0:
-        if can_afford_stock:
-            print("触发最终兜底：买入ETF")
+        # MODIFIED: 动态计算MAX_CASH_POOL
+        MAX_CASH_POOL = monthly_budget * 4
+        
+        print("触发ETF检查:")
+        print(f"  cash_pool: {cash_pool}")
+        print(f"  tracking_months_no_stock: {tracking_months_no_stock}")
+        print(f"  MONTHS_TO_ALLOW_ETF: {MONTHS_TO_ALLOW_ETF}")
+        print(f"  MAX_CASH_POOL: {MAX_CASH_POOL}")
+        
+        allow_etf = False
+        
+        condition_a = initial_cash_pool >= MAX_CASH_POOL
+        condition_b = tracking_months_no_stock >= MONTHS_TO_ALLOW_ETF
+        
+        if condition_a:
+            print(f"  条件A满足: cash_pool >= MAX_CASH_POOL ({initial_cash_pool} >= {MAX_CASH_POOL})")
+        if condition_b:
+            print(f"  条件B满足: 连续{tracking_months_no_stock}个月无股票成交 >= {MONTHS_TO_ALLOW_ETF}个月")
+        
+        if condition_a or condition_b:
+            allow_etf = True
+        
+        print(f"  是否允许ETF: {allow_etf}")
+        
+        if allow_etf:
             etf_stock = None
             for stock in snapshot:
                 if stock.get("stock_code") == "159307":
@@ -669,7 +741,8 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000, current_holding
 
             if etf_stock and etf_stock.get("price") is not None:
                 etf_name = get_stock_name("159307")
-                fallback_buy = calculate_buy_shares(etf_stock["price"], monthly_budget)
+                etf_budget = min(cash_pool, monthly_budget)
+                fallback_buy = calculate_buy_shares(etf_stock["price"], etf_budget)
 
                 if fallback_buy["shares"] > 0:
                     enhanced_actions.append({
@@ -683,7 +756,8 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000, current_holding
                         "deviation": TARGET_WEIGHTS.get("159307", 0.0),
                         "is_fallback_etf": True
                     })
-                    cash_left = fallback_buy["remaining_cash"]
+                    cash_left = cash_pool - (fallback_buy["shares"] * etf_stock["price"])
+                    tracking_months_no_stock = 0
         else:
             print("所有股票均无法买入（不足100股），保留现金")
 

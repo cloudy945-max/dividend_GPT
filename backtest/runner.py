@@ -11,6 +11,57 @@ from backtest.metrics import calculate_metrics
 import visualization
 
 
+def run_backtest(start_date, end_date, monthly_budget):
+    stock_list = ["招商银行", "兴业银行", "工商银行", "双汇发展", "159307"]
+
+    print("="*60)
+    print("开始回测")
+    print("="*60)
+    print(f"股票列表: {stock_list}")
+    print(f"回测期间: {start_date} 至 {end_date}")
+    print(f"月度预算: {monthly_budget}")
+    print("="*60)
+
+    data_loader = BacktestDataLoader('backtest_data')
+    strategy_adapter = StrategyAdapter()
+    engine = BacktestEngine(data_loader, strategy_adapter)
+
+    history = engine.run_backtest(
+        stock_list=stock_list,
+        start_date=start_date,
+        end_date=end_date,
+        monthly_budget=monthly_budget
+    )
+
+    if not history:
+        print("回测失败：未生成历史数据")
+        return None
+
+    for record in history:
+        print(f"{record['date'][:10]} | 总市值: {record['total_value']:,.2f} | "
+              f"持仓: {record['holdings_value']:,.2f} | 现金: {record['cash']:,.2f}")
+
+    metrics = calculate_metrics(history)
+
+    print("\n" + "="*60)
+    print("回测绩效指标")
+    print("="*60)
+    print(f"总收益率: {metrics['total_return']*100:.2f}%")
+    print(f"年化收益率: {metrics['annual_return']*100:.2f}%")
+    print(f"最大回撤: {metrics['max_drawdown']*100:.2f}%")
+    print(f"波动率: {metrics['volatility']*100:.2f}%")
+    print(f"夏普比率: {metrics['sharpe']:.2f}")
+
+    final_value = history[-1]['total_value'] if history else 0
+    print(f"\n最终资产: {final_value:,.2f}")
+
+    return {
+        "history": history,
+        "metrics": metrics,
+        "final_value": final_value
+    }
+
+
 def run_backtest_demo():
     stock_list = ["招商银行", "兴业银行", "工商银行", "双汇发展", "159307"]
 
@@ -225,4 +276,10 @@ class BacktestRunner:
 
 
 if __name__ == '__main__':
-    run_backtest_demo()
+    result = run_backtest(
+        start_date="2023-01-01",
+        end_date="2023-12-31",
+        monthly_budget=3000
+    )
+
+    print("\n回测完成")
