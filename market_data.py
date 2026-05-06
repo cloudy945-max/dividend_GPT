@@ -45,6 +45,14 @@ ALLOWED_STOCKS = [
     "159307"  # ETF使用代码
 ]
 
+# 股票代码映射：内部名称 -> akshare日线接口代码
+STOCK_CODE_MAPPING = {
+    "招商银行": "sh600036",
+    "兴业银行": "sh601166",
+    "工商银行": "sh601398",
+    "双汇发展": "sz000895"
+}
+
 # TARGET_WEIGHTS 使用 stock_code 作为key
 TARGET_WEIGHTS = {
     "兴业银行": 0.30,
@@ -59,6 +67,7 @@ MIN_DEVIATION_TO_BUY = 0.02  # 偏离度阈值：低于此值才允许ETF补仓
 
 _market_df_cache = None
 _etf_df_cache = None
+_daily_cache = {}  # 日线数据缓存，key为股票代码
 _last_update_date = None  # 记录缓存更新日期，格式：YYYY-MM-DD
 CLOSE_TIME = 15  # 收盘时间：下午3点
 
@@ -87,9 +96,10 @@ def need_refresh():
 
 def clear_cache():
     """手动清除缓存"""
-    global _market_df_cache, _etf_df_cache, _last_update_date
+    global _market_df_cache, _etf_df_cache, _daily_cache, _last_update_date
     _market_df_cache = None
     _etf_df_cache = None
+    _daily_cache = {}
     _last_update_date = None
 
 
@@ -889,43 +899,94 @@ def get_market_data(stock_code: str) -> dict:
                 "pb": None
             }
         else:
-            if _market_df_cache is None or need_refresh():
-                print("刷新市场数据缓存")
-                _market_df_cache = ak.stock_zh_a_spot_em()
-                set_market_cache(_market_df_cache)
+            price = None
+            pb = None
+            
+            try:
+                if _market_df_cache is None or need_refresh():
+                    print("刷新市场数据缓存")
+                    _market_df_cache = ak.stock_zh_a_spot_em()
+                    set_market_cache(_market_df_cache)
 
-            if _market_df_cache is None or _market_df_cache.empty:
-                raise ValueError("市场数据获取失败或为空")
+                if _market_df_cache is None or _market_df_cache.empty:
+                    raise ValueError("市场数据获取失败或为空")
 
-            df = _market_df_cache
+                df = _market_df_cache
 
-            if '名称' not in df.columns:
-                raise ValueError("数据源缺少'名称'字段")
+                if '名称' not in df.columns:
+                    raise ValueError("数据源缺少'名称'字段")
 
-            name_series = df['名称'].astype(str)
+                name_series = df['名称'].astype(str)
 
-            lookup_name = STOCK_NAME_MAP.get(stock_code, stock_code)
+                lookup_name = STOCK_NAME_MAP.get(stock_code, stock_code)
 
-            match = df[name_series == lookup_name]
+                match = df[name_series == lookup_name]
 
-            if match.empty and lookup_name != stock_code:
-                match = df[name_series == stock_code]
+                if match.empty and lookup_name != stock_code:
+                    match = df[name_series == stock_code]
 
-            if match.empty:
-                match = df[name_series.str.contains(stock_code, na=False)]
+                if match.empty:
+                    match = df[name_series.str.contains(stock_code, na=False)]
 
-            if match.empty:
-                raise ValueError(f"未找到股票: {stock_code}")
+                if match.empty:
+                    raise ValueError(f"未找到股票: {stock_code}")
 
-            row = match.iloc[0]
+                row = match.iloc[0]
 
-            price = safe_float(row.get('最新价'))
+                price = safe_float(row.get('最新价'))
+                if price is None:
+                    price = safe_float(row.get('收盘价'))
+                if price is not None and price <= 0:
+                    price = None
+
+                pb = safe_float(row.get('市净率'))
+                
+                print(f"使用主接口获取数据成功: {stock_code}, price={price}, pb={pb}")
+                
+            except Exception as primary_e:
+                print(f"主接口获取失败: {primary_e}，尝试备选接口...")
+                
+                ak_code = STOCK_CODE_MAPPING.get(stock_code)
+                if ak_code:
+                    try:
+                        # 检查日线缓存是否需要刷新
+                        need_daily_refresh = True
+                        if ak_code in _daily_cache:
+                            cached_date = _daily_cache[ak_code].get('date')
+                            if cached_date == pd.Timestamp.now().strftime('%Y-%m-%d'):
+                                need_daily_refresh = False
+                        
+                        if need_daily_refresh:
+                            # 获取最近30天的日线数据，确保获取到最新收盘价
+                            end_date = pd.Timestamp.now().strftime('%Y%m%d')
+                            start_date = (pd.Timestamp.now() - pd.Timedelta(days=30)).strftime('%Y%m%d')
+                            df_daily = ak.stock_zh_a_daily(symbol=ak_code, start_date=start_date, end_date=end_date, adjust='qfq')
+                            
+                            if not df_daily.empty:
+                                df_daily = df_daily.sort_values('date', ascending=False)
+                                latest_row = df_daily.iloc[0]
+                                latest_price = safe_float(latest_row.get('close'))
+                                latest_date = latest_row.get('date')
+                                
+                                # 缓存数据
+                                _daily_cache[ak_code] = {
+                                    'date': pd.Timestamp.now().strftime('%Y-%m-%d'),
+                                    'price': latest_price,
+                                    'data_date': latest_date
+                                }
+                                price = latest_price
+                                print(f"备选接口获取成功: {stock_code}, price={price} (前复权), 数据日期: {latest_date}")
+                        else:
+                            # 使用缓存数据
+                            cached_data = _daily_cache[ak_code]
+                            price = cached_data.get('price')
+                            print(f"使用缓存的日线数据: {stock_code}, price={price}")
+                            
+                    except Exception as backup_e:
+                        print(f"备选接口也失败: {backup_e}")
+
             if price is None:
-                price = safe_float(row.get('收盘价'))
-            if price is not None and price <= 0:
-                price = None
-
-            pb = safe_float(row.get('市净率'))
+                raise ValueError(f"无法获取 {stock_code} 的价格数据")
 
             return {
                 "stock_code": stock_code,

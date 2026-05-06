@@ -84,13 +84,29 @@ def analyze_portfolio(holdings, snapshot, dividends=None):
     total_value = 0.0
     total_cost = 0.0
     
-    # 创建股票价格映射，方便查找
+    # 创建股票价格映射，方便查找（同时支持代码和名称）
     price_map = {}
     for stock in snapshot:
+        stock_code = stock.get("stock_code")
         stock_name = stock.get("stock_name")
         price = stock.get("price")
+        if stock_code and price is not None:
+            price_map[stock_code] = price
         if stock_name and price is not None:
             price_map[stock_name] = price
+    
+    # 创建已收分红映射
+    dividends_received_map = {}
+    total_dividend_received = 0.0
+    if dividends is not None and not dividends.empty:
+        df_div = dividends.copy()
+        holdings_shares = holdings.set_index('stock_name')['shares']
+        df_div['shares'] = df_div['stock_name'].map(holdings_shares)
+        df_div['total_dividend'] = df_div['dividend_per_share'] * df_div['shares']
+        dividends_by_stock = df_div.groupby('stock_name')['total_dividend'].sum()
+        for stock_name, div in dividends_by_stock.items():
+            dividends_received_map[stock_name] = div
+            total_dividend_received += div
     
     # 遍历每个持仓
     for _, row in holdings.iterrows():
@@ -117,6 +133,12 @@ def analyze_portfolio(holdings, snapshot, dividends=None):
             profit = market_value - total_cost_this
             return_rate = profit / total_cost_this if total_cost_this != 0 else None
         
+        # 获取该持仓已收分红
+        dividend_received = dividends_received_map.get(stock_name, 0.0)
+        adjusted_cost = total_cost_this - dividend_received
+        total_profit_with_div = market_value - adjusted_cost
+        return_rate_with_div = total_profit_with_div / adjusted_cost if adjusted_cost != 0 else None
+        
         position_info = {
             "stock_name": stock_name,
             "shares": shares,
@@ -125,7 +147,11 @@ def analyze_portfolio(holdings, snapshot, dividends=None):
             "price": price,
             "market_value": market_value,
             "profit": profit,
-            "return_rate": return_rate
+            "return_rate": return_rate,
+            "dividend_received": dividend_received,
+            "adjusted_cost": adjusted_cost,
+            "total_profit_with_div": total_profit_with_div,
+            "return_rate_with_div": return_rate_with_div
         }
         
         positions.append(position_info)
@@ -200,13 +226,14 @@ def analyze_portfolio(holdings, snapshot, dividends=None):
     # 这个不影响估值，不需要警告
     
     if has_warning:
-        print("⚠️  部分资产缺少价格，估值可能不准确")
+        print("Warning: 部分资产缺少价格，估值可能不准确")
     
     return {
         "total_value": total_value,
         "total_cost": total_cost,
         "total_profit": total_profit,
         "total_return": total_return,
+        "total_dividend_received": total_dividend_received,
         "annual_dividend": annual_dividend,
         "dividend_yield": dividend_yield,
         "cashflow_quality": cashflow_quality,
@@ -267,35 +294,39 @@ def print_analysis(analysis):
 def print_dashboard(analysis):
     """
     打印投资组合仪表盘（简洁版）
-    
+
     Args:
         analysis: analyze_portfolio 返回的分析结果
     """
     print("\n==== 投资组合总览 ====\n")
-    
+
     print(f"总资产：{analysis['total_value']:,.2f}")
-    
+
     if analysis['total_return'] is not None:
         sign = "+" if analysis['total_return'] >= 0 else ""
         print(f"总收益率：{sign}{analysis['total_return']*100:.1f}%")
     else:
         print("总收益率：--")
-    
+
+    total_div_received = analysis.get('total_dividend_received', 0.0)
+    if total_div_received > 0:
+        print(f"已收分红：+{total_div_received:.2f}")
+
     print(f"年现金流：{analysis['annual_dividend']:,.2f}")
-    
+
     if analysis['dividend_yield'] is not None:
         print(f"股息率：{analysis['dividend_yield']*100:.1f}%")
     else:
         print("股息率：--")
-    
+
     if analysis['cashflow_quality'] is not None:
         print(f"现金流质量：{analysis['cashflow_quality']*100:.1f}%")
     else:
         print("现金流质量：--")
-    
+
     if analysis.get('needs_rebalance'):
-        print("\n⚠️  需要再平衡！")
-    
+        print("\n! 需要再平衡！")
+
     print("\n---- 资产分布 ----")
     deviation_map = analysis.get('deviation_map', {})
     for alloc in analysis['allocation']:
@@ -303,13 +334,24 @@ def print_dashboard(analysis):
         diff = deviation_map.get(stock_name, 0.0)
         sign = "+" if diff >= 0 else ""
         print(f"{stock_name}：{alloc['weight']*100:.0f}%  ({sign}{diff*100:.0f}%)")
-    
+
     print("\n---- 收益情况 ----")
+    print(f"{'名称':<12} {'市值':>10} {'综合收益率':>10} {'已收分红':>10}")
+    print("-" * 45)
     for pos in analysis['positions']:
-        if pos['return_rate'] is not None:
-            sign = "+" if pos['return_rate'] >= 0 else ""
-            print(f"{pos['stock_name']}：{sign}{pos['return_rate']*100:.1f}%")
+        stock_name = pos['stock_name']
+        market_value = pos.get('market_value', 0.0)
+        return_rate_with_div = pos.get('return_rate_with_div')
+        div_received = pos.get('dividend_received', 0.0)
+
+        if return_rate_with_div is not None:
+            sign = "+" if return_rate_with_div >= 0 else ""
+            rate_str = f"{sign}{return_rate_with_div*100:.1f}%"
         else:
-            print(f"{pos['stock_name']}：--")
-    
+            rate_str = "--"
+
+        div_str = f"+{div_received:.0f}元" if div_received > 0 else "--"
+
+        print(f"{stock_name:<12} {market_value:>10.2f} {rate_str:>10} {div_str:>10}")
+
     print()

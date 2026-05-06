@@ -66,8 +66,9 @@
 
 **验证**:
 
-| 测试用例 | 预期 | 实际 | 状态 |
-| ---- | -- | -- | -- |
+| 测试用例   | 预期     | 实际     | 状态     |
+| ------ | ------ | ------ | ------ |
+| <br /> | <br /> | <br /> | <br /> |
 
 ````
 
@@ -1360,3 +1361,177 @@ MONTHS_TO_ALLOW_ETF}")
 文件 用途 test\_etf\_fallback.py ETF fallback 逻辑测试 test\_backtest\_full.py 完整资金演化系统测试 test\_history\_data.py 历史数据加载测试 test\_market\_data.py 市场数据结构验证 test\_execution\_plan.py 策略决策逻辑验证
 
 最后更新: 2026-05-05
+
+***
+
+## \[2026-05-06] A股市场数据接口修复
+
+现象 : 选择7运行分析时，ETF数据获取成功但A股股票数据全部失败
+
+根因 : ak.stock\_zh\_a\_spot\_em() 接口返回 Connection aborted: Remote end closed connection without response ，而 ak.fund\_etf\_spot\_em() 接口正常工作
+
+修复 :
+
+```
+# market_data.py
+
+# 新增股票代码映射，用于备选接口
+STOCK_CODE_MAPPING = {
+    "招商银行": "sh600036",
+    "兴业银行": "sh601166",
+    "工商银行": "sh601398",
+    "双汇发展": "sz000895"
+}
+
+# 主接口失败时，备选使用日线接口
+except Exception as primary_e:
+    print(f"主接口获取失败: 
+    {primary_e}，尝试备选接口...")
+    ak_code = STOCK_CODE_MAPPING.get
+    (stock_code)
+    if ak_code:
+        df_daily = ak.
+        stock_zh_a_daily
+        (symbol=ak_code, 
+        start_date=start_date, 
+        end_date=end_date, 
+        adjust='qfq')
+        # 获取最新收盘价
+```
+
+验证 :
+
+标的 预期 实际 状态 招商银行 获取成功 price=41.04 (前复权) ✅ 兴业银行 获取成功 price=20.45 (前复权) ✅ 工商银行 获取成功 price=7.93 (前复权) ✅ 双汇发展 获取成功 price=25.74 (前复权) ✅
+
+## \[2026-05-06] ETF收益显示-100%问题
+
+现象 : 159307收益显示为-100%，其他股票正常
+
+根因 : 持仓中ETF存储的是代码 159307 ，但市场数据返回的名称是 红利低波100ETF ，导致 price\_map.get("159307") 返回 None
+
+修复 :
+
+```
+# portfolio_analysis.py
+
+# 创建股票价格映射，方便查找（同时支持代码
+和名称）
+price_map = {}
+for stock in snapshot:
+    stock_code = stock.get
+    ("stock_code")
+    stock_name = stock.get
+    ("stock_name")
+    price = stock.get("price")
+    if stock_code and price is not 
+    None:
+        price_map[stock_code] = 
+        price  # 新增：用代码作为key
+    if stock_name and price is not 
+    None:
+        price_map[stock_name] = 
+        price  # 保留：用名称作为key
+```
+
+验证 :
+
+标的 修复前收益率 修复后收益率 状态 159307 -100% +0.28% ✅ 其他股票 正常 正常 ✅
+
+## \[2026-05-06] 日线数据前复权 + 缓存机制
+
+现象 : 备选接口获取的日线数据是不复权的，与用户输入的前复权成本价不匹配
+
+根因 : ak.stock\_zh\_a\_daily() 默认返回不复权数据
+
+修复 :
+
+```
+# market_data.py
+
+# 1. 日线数据缓存
+_daily_cache = {}  # key为股票代码
+
+# 2. 备选接口使用前复权 + 动态日期范围
+df_daily = ak.stock_zh_a_daily(
+    symbol=ak_code, 
+    start_date=(pd.Timestamp.now() 
+    - pd.Timedelta(days=30)).
+    strftime('%Y%m%d'),
+    end_date=pd.Timestamp.now().
+    strftime('%Y%m%d'), 
+    adjust='qfq'  # 前复权
+)
+
+# 3. 缓存机制：每天只刷新一次
+need_daily_refresh = True
+if ak_code in _daily_cache:
+    cached_date = _daily_cache
+    [ak_code].get('date')
+    if cached_date == pd.Timestamp.
+    now().strftime('%Y-%m-%d'):
+        need_daily_refresh = False
+```
+
+验证 :
+
+操作 日志输出 状态 第一次获取 备选接口获取成功... ✅ 从网络获取 第二次获取 使用缓存的日线数据... ✅ 使用缓存 清除缓存后 备选接口获取成功... ✅ 重新获取
+
+## \[2026-05-06] 分红收益直观展示
+
+现象 : 分红只是记录到系统中，没有直观展示给用户
+
+根因 : 原系统只计算股价波动收益，分红现金虽已发放但未计入收益展示
+
+修复 :
+
+```
+# portfolio_analysis.py
+
+# 1. 计算每个持仓已收分红
+dividends_received_map = {}
+for stock_name, div in 
+dividends_by_stock.items():
+    dividends_received_map
+    [stock_name] = div
+
+# 2. 计算综合收益（扣除分红后的成本）
+dividend_received = 
+dividends_received_map.get
+(stock_name, 0.0)
+adjusted_cost = total_cost_this - 
+dividend_received
+total_profit_with_div = 
+market_value - adjusted_cost
+return_rate_with_div = 
+total_profit_with_div / 
+adjusted_cost
+
+# 3. 展示修改
+print(f"{'名称':<12} {'市值':>10} {'
+综合收益率':>10} {'已收分红':>10}")
+print("-" * 45)
+for pos in analysis['positions']:
+    print(f"{stock_name:<12} 
+    {market_value:>10.2f} 
+    {rate_str:>10} {div_str:>10}")
+```
+
+验证 :
+
+```
+---- 收益情况 ----
+名称                   市值      综合
+收益率       已收分红
+------------------------------------
+---------
+双汇发展            5542.00     +17.
+3%      +160元
+兴业银行            5337.00      -2.
+7%         --
+工商银行            2208.00      -1.
+6%         --
+红利低波100ETF      1927.80      +0.
+3%         --
+```
+
+最后更新: 2026-05-06
