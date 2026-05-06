@@ -1,6 +1,6 @@
 # 回测系统开发日志
 
----
+***
 
 ## 规则章
 
@@ -42,17 +42,17 @@
 
 ### 内容分类
 
-| 类型 | 说明 | 更新频率 |
-|------|------|---------|
-| 项目概述 | 项目背景、目标、目录结构 | 创建时写，不更新 |
-| 模块说明 | 各模块功能、接口、返回格式 | 创建时写，不更新 |
-| 调试记录 | 问题描述、根因、修复、验证 | 发现问题时写 |
-| 设计原则 | 架构决策、约束条件 | 罕见更新 |
-| AI上下文 | 供AI使用的关键信息 | 按需更新 |
+| 类型    | 说明            | 更新频率     |
+| ----- | ------------- | -------- |
+| 项目概述  | 项目背景、目标、目录结构  | 创建时写，不更新 |
+| 模块说明  | 各模块功能、接口、返回格式 | 创建时写，不更新 |
+| 调试记录  | 问题描述、根因、修复、验证 | 发现问题时写   |
+| 设计原则  | 架构决策、约束条件     | 罕见更新     |
+| AI上下文 | 供AI使用的关键信息    | 按需更新     |
 
 ### 问题记录格式
 
-```
+````
 ### [日期] 问题标题
 
 **现象**: 一句话描述问题现象
@@ -62,12 +62,14 @@
 **修复**:
 ```python
 # 关键代码修改
-```
+````
 
 **验证**:
+
 | 测试用例 | 预期 | 实际 | 状态 |
-|---------|------|------|------|
-```
+| ---- | -- | -- | -- |
+
+````
 
 ### 代码片段规则
 
@@ -96,21 +98,23 @@
 
 ### 目录结构
 
-```
+````
+
 backtest/
-    __init__.py
-    data_loader.py
-    simulator.py
-    strategy_adapter.py
-    metrics.py
-    runner.py
+__init__.py
+data\_loader.py
+simulator.py
+strategy\_adapter.py
+metrics.py
+runner.py
 
-backtest_data/
-    cache/
+backtest\_data/
+cache/
 
-test_market_data.py
-test_execution_plan.py
-```
+test\_market\_data.py
+test\_execution\_plan.py
+
+````
 
 ---
 
@@ -128,42 +132,44 @@ test_execution_plan.py
 返回:
 ```python
 {"招商银行": DataFrame(date, close), "159307": DataFrame(date, close)}
-```
+````
 
 特性: 交易日对齐、停牌用前值填充、缓存到 `backtest_data/cache/`
 
-**get_price_percentile**
+**get\_price\_percentile**
 
-计算当前价格在历史中的分位（0.0~1.0），用于估值代理。
+计算当前价格在历史中的分位（0.0\~1.0），用于估值代理。
 
----
+***
 
-### 策略适配器 (strategy_adapter.py)
+### 策略适配器 (strategy\_adapter.py)
 
-**should_strong_buy 逻辑**
+**should\_strong\_buy 逻辑**
 
 优先级: PB > 价格分位 > 禁用
 
 阈值:
+
 ```python
 PB_BUY_THRESHOLDS = {"招商银行": 0.85, "兴业银行": 0.75, "工商银行": 0.75}
 PRICE_PERCENTILE_THRESHOLDS = {"招商银行": 0.15, "兴业银行": 0.25, "工商银行": 0.25}
 ```
 
-**run_strategy**
+**run\_strategy**
 
 调用现有 `generate_execution_plan()` 并适配数据格式。
 
-输入: snapshot, current_holdings, cash_pool, monthly_budget
-返回: {"actions": [...], "cash_left": float, "cash_pool": float}
+输入: snapshot, current\_holdings, cash\_pool, monthly\_budget
+返回: {"actions": \[...], "cash\_left": float, "cash\_pool": float}
 
----
+***
 
 ### 回测引擎 (simulator.py)
 
-**BacktestEngine.run_backtest**
+**BacktestEngine.run\_backtest**
 
 月度循环:
+
 ```python
 for each month:
     cash += monthly_budget
@@ -175,13 +181,14 @@ for each month:
 
 **无未来函数保证**: `_build_snapshot` 只使用 `<= current_date` 的数据
 
----
+***
 
 ### 绩效指标 (metrics.py)
 
-**calculate_metrics**
+**calculate\_metrics**
 
 返回:
+
 ```python
 {
     "total_return": 0.0,
@@ -194,17 +201,18 @@ for each month:
 
 年化按252交易日，回撤基于rolling max。
 
----
+***
 
 ## 调试记录
 
-### [2026-05-04] CASE1无买入 + CASE3误触发ETF
+### \[2026-05-04] CASE1无买入 + CASE3误触发ETF
 
 **问题**: CASE1无买入，CASE3误触发ETF兜底
 
 **根因**: fallback逻辑不完善，未检查"是否真的买得起"
 
 **修复**:
+
 ```python
 can_afford_stock = False
 for stock in snapshot:
@@ -223,16 +231,17 @@ if len(enhanced_actions) == 0:
 ```
 
 **验证**:
-| Case | 条件 | 预期 | 状态 |
-|------|------|------|------|
-| CASE1 | 无持仓，无强买 | ETF兜底买 | ✅ |
-| CASE2 | 强买pb=0.8 | 强买正常 | ✅ |
-| CASE3 | 全部买不起100股 | 保留现金 | ✅ |
-| CASE4 | 有持仓+再平衡 | 再平衡正常 | ✅ |
 
----
+| Case  | 条件        | 预期     | 状态 |
+| ----- | --------- | ------ | -- |
+| CASE1 | 无持仓，无强买   | ETF兜底买 | ✅  |
+| CASE2 | 强买pb=0.8  | 强买正常   | ✅  |
+| CASE3 | 全部买不起100股 | 保留现金   | ✅  |
+| CASE4 | 有持仓+再平衡   | 再平衡正常  | ✅  |
 
-### [2026-05-04] 强买逻辑依赖plan.buy_list
+***
+
+### \[2026-05-04] 强买逻辑依赖plan.buy\_list
 
 **问题**: 原逻辑依赖 `plan.get("buy_list")`，应该独立判断
 
@@ -257,9 +266,9 @@ for stock in snapshot:
             strong_buy_pb = pb
 ```
 
----
+***
 
-### [2026-05-04] 贪心补缺口算法排序
+### \[2026-05-04] 贪心补缺口算法排序
 
 **修改**: 优先建仓当前为0的资产，再按gap排序
 
@@ -267,9 +276,9 @@ for stock in snapshot:
 gaps.sort(key=lambda x: (x["current_value"] == 0, x["gap"]), reverse=True)
 ```
 
----
+***
 
-### [2026-05-04] actions聚合逻辑
+### \[2026-05-04] actions聚合逻辑
 
 使用dict聚合，同一股票多次买入合并为一条记录
 
@@ -284,7 +293,7 @@ for buy in strong_buy_buys:
 enhanced_actions = [v for v in actions_dict.values() if v["shares"] > 0]
 ```
 
----
+***
 
 ## 设计原则
 
@@ -294,7 +303,7 @@ enhanced_actions = [v for v in actions_dict.values() if v["shares"] > 0]
 4. **最小交易单位**: 100股，不允许拆分
 5. **边界约束**: 不允许"有预算但不投资"（除非真的买不起）
 
----
+***
 
 ## 待优化项
 
@@ -303,7 +312,7 @@ enhanced_actions = [v for v in actions_dict.values() if v["shares"] > 0]
 3. 回测结果可视化可增强
 4. 交易成本模型可细化
 
----
+***
 
 ## AI上下文
 
@@ -343,12 +352,12 @@ BacktestEngine.run_backtest (backtest/simulator.py)
 
 ### CASE测试用例
 
-| Case | 场景 | 验证点 |
-|------|------|--------|
+| Case  | 场景      | 验证点     |
+| ----- | ------- | ------- |
 | CASE1 | 无持仓，无强买 | ETF兜底触发 |
-| CASE2 | PB触发强买 | 强买标的优先 |
-| CASE3 | 买不起100股 | 保留现金 |
-| CASE4 | 有持仓再平衡 | 补缺口逻辑 |
+| CASE2 | PB触发强买  | 强买标的优先  |
+| CASE3 | 买不起100股 | 保留现金    |
+| CASE4 | 有持仓再平衡  | 补缺口逻辑   |
 
 ### 已知陷阱
 
@@ -356,15 +365,16 @@ BacktestEngine.run_backtest (backtest/simulator.py)
 2. **强买与再平衡**: 强买优先消耗 `total_budget`
 3. **actions聚合**: `shares <= 0` 不加入
 
----
+***
 
-## [2026-05-03] 统一ETF标识 + 表格显示修复
+## \[2026-05-03] 统一ETF标识 + 表格显示修复
 
 ### 问题1: ETF标识不统一
 
 **现象**: ETF在内部计算和展示时标识混乱
 
 **修复**:
+
 ```python
 # 引入两个字段
 "stock_code": "159307",        # 内部计算用
@@ -377,21 +387,23 @@ CODE_TO_NAME = {"159307": "红利低波100ETF", "招商银行": "招商银行", 
 ```
 
 **验证**:
-| 函数 | stock_code | stock_name |
-|------|-----------|------------|
-| get_market_data | ✅ | ✅ |
-| generate_execution_plan | ✅ | ✅ |
-| actions | ✅ | ✅ |
 
----
+| 函数                        | stock\_code | stock\_name |
+| ------------------------- | ----------- | ----------- |
+| get\_market\_data         | ✅           | ✅           |
+| generate\_execution\_plan | ✅           | ✅           |
+| actions                   | ✅           | ✅           |
 
-### 问题2: manage_portfolio.py 表格显示不对齐
+***
+
+### 问题2: manage\_portfolio.py 表格显示不对齐
 
 **现象**: 列标题和数据没有分隔，数据全部连在一起
 
 **根因**: 使用字符串拼接没有添加分隔符
 
 **修复**:
+
 ```python
 # 列之间加2个空格分隔
 header_parts = []
@@ -401,7 +413,7 @@ print("  ".join(header_parts))  # 用2个空格连接
 print("-" * (sum(col_widths.values()) + 2 * (len(col_widths) - 1)))
 ```
 
----
+***
 
 ### 问题3: 日期显示格式不对
 
@@ -410,6 +422,7 @@ print("-" * (sum(col_widths.values()) + 2 * (len(col_widths) - 1)))
 **根因**: pandas Timestamp对象直接转字符串
 
 **修复**:
+
 ```python
 def format_date(value):
     import pandas as pd
@@ -425,11 +438,12 @@ def format_date(value):
     return str(value)[:10]
 ```
 
----
+***
 
 ### 问题4: 列名是英文没有转中文
 
 **修复**:
+
 ```python
 COLUMN_NAMES_MAP = {
     'stock_name': '股票名称',
@@ -447,9 +461,9 @@ COLUMN_NAMES_MAP = {
 df_copy.columns = [COLUMN_NAMES_MAP.get(col, col) for col in df_copy.columns]
 ```
 
----
+***
 
-## [2026-05-03] 资金池统计 + 再平衡优化
+## \[2026-05-03] 资金池统计 + 再平衡优化
 
 ### 问题: 资金池使用统计错误
 
@@ -458,6 +472,7 @@ df_copy.columns = [COLUMN_NAMES_MAP.get(col, col) for col in df_copy.columns]
 **根因**: 旧逻辑只在 `current_holdings is None` 时才计算
 
 **修复**:
+
 ```python
 # 简化计算公式
 used_cash_pool = max(0, total_budget - monthly_budget)
@@ -467,13 +482,14 @@ cash_pool = min(cash_left, MAX_CASH_POOL)
 remaining_cash_pool = cash_pool  # 在更新后计算
 ```
 
----
+***
 
-### 优化: calculate_rebalance_buys 新策略
+### 优化: calculate\_rebalance\_buys 新策略
 
 **旧策略**: 比例缩放
 
 **新策略**:
+
 ```python
 # Step1: 计算偏离度
 deviation = target_weight - current_weight
@@ -491,13 +507,14 @@ while cash_pool >= 100:
 
 **强买优先级**: `effective_deviation = deviation * 1.5`
 
----
+***
 
 ### 优化: ETF买入规则
 
 **条件**: 只有当所有股票 `deviation < 0.02` 才允许买ETF
 
 **最大化买入**:
+
 ```python
 # 优化前：逐手买
 while cash_pool >= etf_price * 100:
@@ -512,13 +529,14 @@ if cash_pool >= min_lot_cost:
     cost = shares * etf_price
 ```
 
----
+***
 
-## [2026-05-03] 健壮性增强
+## \[2026-05-03] 健壮性增强
 
 ### 问题: price为None导致计算错误
 
 **修复**:
+
 ```python
 # 统一过滤 price_map
 price_map = {}
@@ -535,11 +553,12 @@ if not valid_stocks_for_buy:
     return {"buys": [], "cash_left": total_budget}
 ```
 
----
+***
 
-### 问题: current_holdings允许缺失
+### 问题: current\_holdings允许缺失
 
 **修复**:
+
 ```python
 # 自动补0
 current_holdings = dict(current_holdings) if current_holdings else {}
@@ -548,7 +567,7 @@ for stock_code in target_weights.keys():
         current_holdings[stock_code] = 0.0
 ```
 
----
+***
 
 ### 日志记录
 
@@ -562,9 +581,9 @@ if skipped_stocks:
     print(f"  [警告] 以下标的因价格无效未参与计算: {', '.join(skipped_stocks)}")
 ```
 
----
+***
 
-## [2026-05-03] 市场数据缓存优化
+## \[2026-05-03] 市场数据缓存优化
 
 ### 问题: 频繁刷新数据
 
@@ -591,24 +610,27 @@ def need_refresh():
 ```
 
 **缓存策略**:
-| 时间 | 行为 |
-|------|------|
-| 第一次运行 | 刷新并缓存 |
-| 15:00 之前 | 使用缓存 |
+
+| 时间          | 行为      |
+| ----------- | ------- |
+| 第一次运行       | 刷新并缓存   |
+| 15:00 之前    | 使用缓存    |
 | 15:00 之后第一次 | 刷新并更新缓存 |
-| 15:00 之后后续 | 使用当天缓存 |
+| 15:00 之后后续  | 使用当天缓存  |
 
 **ETF缓存**:
+
 ```python
 _etf_df_cache = None  # ETF独立缓存
 def need_refresh():    # A股和ETF共用刷新判断
 ```
 
----
+***
 
-## [2026-05-03] README文档编写
+## \[2026-05-03] README文档编写
 
 新增 `README.md`，包含：
+
 - 功能特点
 - 文件结构
 - 安装依赖
@@ -621,17 +643,18 @@ def need_refresh():    # A股和ETF共用刷新判断
 - 数据格式
 - 刷新机制
 
----
+***
 
----
+***
 
-## [2026-05-03] 持仓管理增强 + 数据结构扩展
+## \[2026-05-03] 持仓管理增强 + 数据结构扩展
 
 ### 增强1: 日期类型转换
 
 **需求**: transactions 和 dividends 的 date 字段需要转换为 datetime 类型
 
 **修复**:
+
 ```python
 def load_data(self):
     if os.path.exists(self.transactions_path):
@@ -643,13 +666,14 @@ def load_data(self):
     # ... dividends 同理
 ```
 
----
+***
 
 ### 增强2: 卖出股数校验
 
 **需求**: 防止卖出超过持仓
 
 **修复**:
+
 ```python
 def _update_holdings_sell(self, stock_name, shares):
     if stock_name in self.holdings['stock_name'].values:
@@ -660,13 +684,14 @@ def _update_holdings_sell(self, stock_name, shares):
         # ... 原有逻辑
 ```
 
----
+***
 
-### 增强3: 现金流字段 cash_flow
+### 增强3: 现金流字段 cash\_flow
 
 **需求**: 记录每笔交易的现金流
 
 **修复**:
+
 ```python
 def add_transaction(self, date, type_, stock_name, price, shares):
     if type_ == 'buy':
@@ -689,13 +714,14 @@ def add_transaction(self, date, type_, stock_name, price, shares):
 
 **兼容性**: 旧数据自动补 `cash_flow = 0.0`
 
----
+***
 
-### 增强4: 总成本字段 total_cost
+### 增强4: 总成本字段 total\_cost
 
 **需求**: 记录持仓总成本 = 股数 × 成本价
 
 **修复**:
+
 ```python
 # 买入时更新
 self.holdings.at[idx, 'shares'] = new_shares
@@ -706,27 +732,29 @@ self.holdings.at[idx, 'total_cost'] = new_shares * new_cost
 self.holdings.at[idx, 'total_cost'] = old_total_cost * (new_shares / old_shares)
 ```
 
----
+***
 
 ### 新增: 按日期排序的交易
 
 **需求**: 获取按日期升序排序的交易记录
 
 **新增**:
+
 ```python
 def get_transactions_sorted(self):
     return self.transactions.sort_values('date').copy()
 ```
 
----
+***
 
-## [2026-05-03] 市场数据模块增强
+## \[2026-05-03] 市场数据模块增强
 
 ### 增强1: 股票名称映射机制
 
 **问题**: akshare 返回的名称与输入可能不一致
 
 **修复**:
+
 ```python
 STOCK_NAME_MAP = {
     "招商银行": "招商银行",
@@ -741,13 +769,14 @@ def get_market_data(stock_name: str) -> dict:
     # ... 优先用映射名匹配，失败再用原名称，最后模糊匹配
 ```
 
----
+***
 
 ### 增强2: 缓存机制优化
 
 **问题**: 每次调用都重新获取全市场数据
 
 **修复**:
+
 ```python
 _market_df_cache = None
 _last_update_time = None
@@ -762,13 +791,14 @@ def get_market_data(stock_name: str) -> dict:
     # ...
 ```
 
----
+***
 
 ### 增强3: 字段读取安全
 
 **问题**: akshare 字段可能变化，导致 KeyError
 
 **修复**:
+
 ```python
 # 使用 .get() 而不是直接访问
 price = row.get('最新价')
@@ -783,13 +813,14 @@ if '名称' not in df.columns:
 name_series = df['名称'].astype(str)
 ```
 
----
+***
 
 ### 增强4: 批量获取函数
 
 **需求**: 一次获取多个股票的数据
 
 **新增**:
+
 ```python
 def get_multiple_market_data(stock_list: list) -> list:
     results = []
@@ -808,11 +839,12 @@ def get_multiple_market_data(stock_list: list) -> list:
     return results
 ```
 
----
+***
 
 ### 增强5: 安全辅助函数
 
 **新增**:
+
 ```python
 def safe_float(value):
     if value is None or pd.isna(value) or value == '-':
@@ -820,13 +852,14 @@ def safe_float(value):
     return float(value)
 ```
 
----
+***
 
 ### 增强6: 输入校验
 
 **需求**: 防止误输入不支持的股票
 
 **新增**:
+
 ```python
 ALLOWED_STOCKS = ["招商银行", "兴业银行", "工商银行", "双汇发展", "红利ETF"]
 
@@ -836,15 +869,16 @@ def get_market_data(stock_name: str) -> dict:
     # ...
 ```
 
----
+***
 
-## [2026-05-03] 执行计划模块
+## \[2026-05-03] 执行计划模块
 
 ### 新增1: 买入股数计算
 
 **需求**: 计算在100股限制下最多能买多少股
 
 **新增**:
+
 ```python
 def calculate_buy_shares(price, budget):
     if price is None or price <= 0 or budget is None or budget <= 0:
@@ -860,13 +894,14 @@ def calculate_buy_shares(price, budget):
     }
 ```
 
----
+***
 
 ### 新增2: 单次买入执行
 
 **需求**: 执行单次买入决策
 
 **新增**:
+
 ```python
 def execute_single_buy(stock, budget):
     if stock.get("price") is None:
@@ -883,13 +918,14 @@ def execute_single_buy(stock, budget):
     }
 ```
 
----
+***
 
 ### 新增3: ETF兜底分配
 
 **需求**: 优先买目标股票，剩余买ETF
 
 **核心逻辑**:
+
 ```python
 def allocate_with_etf(plan, snapshot, monthly_budget, cash_pool_amount, strong_buy):
     # ... 个股买入
@@ -914,13 +950,14 @@ def allocate_with_etf(plan, snapshot, monthly_budget, cash_pool_amount, strong_b
         print(f"警告: 现金流不平衡! 输入: {total_input:.2f}, 输出: {total_output:.2f}")
 ```
 
----
+***
 
 ### 新增4: 生成执行计划
 
 **需求**: 整合所有逻辑，生成可执行计划
 
 **新增**:
+
 ```python
 def generate_execution_plan(plan, snapshot, monthly_budget=3000):
     # 1. 只针对目标买入标的判断强买
@@ -983,15 +1020,16 @@ def generate_execution_plan(plan, snapshot, monthly_budget=3000):
     }
 ```
 
----
+***
 
-## [2026-05-04] 投资组合分析模块
+## \[2026-05-04] 投资组合分析模块
 
 ### 新增1: 基础分析功能
 
 **需求**: 计算市值、成本、收益、收益率
 
 **新增**:
+
 ```python
 def analyze_portfolio(holdings, snapshot, dividends=None):
     positions = []
@@ -1045,13 +1083,14 @@ def analyze_portfolio(holdings, snapshot, dividends=None):
     }
 ```
 
----
+***
 
 ### 新增2: 年分红现金流
 
 **需求**: 计算年分红现金流 = sum(每个股票 分红 × 当前持仓股数)
 
 **新增**:
+
 ```python
 def calculate_annual_dividend(holdings, dividends):
     annual_dividend = 0.0
@@ -1075,7 +1114,8 @@ def calculate_annual_dividend(holdings, dividends):
     return annual_dividend
 ```
 
-**修改 analyze_portfolio**:
+**修改 analyze\_portfolio**:
+
 ```python
 # 计算年分红现金流
 annual_dividend = 0.0
@@ -1094,13 +1134,14 @@ return {
 }
 ```
 
----
+***
 
 ### 新增3: 打印分析结果
 
 **需求**: 格式化输出分析结果
 
 **新增**:
+
 ```python
 def print_analysis(analysis):
     print("\n" + "="*60)
@@ -1141,7 +1182,7 @@ def print_analysis(analysis):
     print("\n" + "="*60)
 ```
 
----
+***
 
 ## 设计原则更新
 
@@ -1160,7 +1201,7 @@ def print_analysis(analysis):
 3. **空值处理**: price/pb 为 None 时不报错
 4. **actions聚合**: 使用dict防止重复标的
 
----
+***
 
 ## AI上下文更新
 
@@ -1194,7 +1235,8 @@ PortfolioManager (portfolio.py)
 
 ### 返回结构示例
 
-**generate_execution_plan**:
+**generate\_execution\_plan**:
+
 ```python
 {
     "month_budget": 3000,
@@ -1209,7 +1251,8 @@ PortfolioManager (portfolio.py)
 }
 ```
 
-**analyze_portfolio**:
+**analyze\_portfolio**:
+
 ```python
 {
     "total_value": 50000.0,
@@ -1222,6 +1265,98 @@ PortfolioManager (portfolio.py)
 }
 ```
 
----
+***
 
 *最后更新: 2026-05-04*
+
+<br />
+
+***
+
+## \[2026-05-05] ETF Fallback 策略优化
+
+现象 : ETF吞噬全部资金，策略退化为ETF定投
+
+根因 : 原有ETF触发条件太宽松，只要没有股票买入就立即执行ETF兜底
+
+修复 :
+
+1. 参数调整:
+
+```
+MONTHS_TO_ALLOW_ETF = 6  # 原为3，延
+长等待时间
+# MAX_CASH_POOL 改为动态计算
+MAX_CASH_POOL = monthly_budget * 4  
+# 原为2倍
+```
+
+1. 新增安全限制:
+
+```
+# 只有在 buy_list 为空时，才允许触发ETF
+买入
+if buy_list:
+    allow_etf = False
+    print("  禁止ETF：有候选股票待买")
+```
+
+1. ETF买入金额限制:
+
+```
+# ETF买入使用资金 = min
+(monthly_budget, cash_pool)
+etf_budget = min(monthly_remaining, 
+monthly_budget)
+```
+
+1. 增加调试输出:
+
+```
+print("====== ETF 决策调试 ======")
+print(f"cash_pool: 
+{cash_pool_amount}")
+print(f"MONTHS_TO_ALLOW_ETF: 
+{MONTHS_TO_ALLOW_ETF}")
+print(f"MAX_CASH_POOL: 
+{MAX_CASH_POOL}")
+print(f"条件A(cash_pool>=MAX): 
+{cash_pool_amount >= MAX_CASH_POOL}
+")
+print(f"条件B(月数>=阈值): 
+{tracking_months_no_stock >= 
+MONTHS_TO_ALLOW_ETF}")
+```
+
+1. 未来扩展钩子:
+
+```
+# TODO: 如果未来出现 strong_buy 机会，
+考虑卖出ETF换仓股票（ETF -> 股票切换机
+制）
+```
+
+修改文件 : market\_data.py (全局参数、allocate\_with\_etf、generate\_execution\_plan)
+
+验证 :
+
+测试用例 预期 实际 状态 CASE1 正常买入股票 成功买入股票 ✅ CASE2 买不起股票保留现金 保留现金不买ETF ✅ CASE3 积累后触发ETF 第5个月触发ETF买入 ✅ CASE4 条件A触发 cash\_pool达12000时触发 ✅
+
+## \[2026-05-05] 删除冗余测试文件
+
+现象 : 项目中存在多个功能重复的测试文件
+
+根因 : 开发过程中创建的临时测试文件未及时清理
+
+修复 :
+
+删除以下冗余文件:
+
+- test\_etf.py - 早期探索性测试，已过时
+- test\_etf\_logic.py - 与 test\_backtest\_full.py 功能重复
+- test\_backtest\_logic.py - 调试功能测试
+  保留的核心测试文件:
+
+文件 用途 test\_etf\_fallback.py ETF fallback 逻辑测试 test\_backtest\_full.py 完整资金演化系统测试 test\_history\_data.py 历史数据加载测试 test\_market\_data.py 市场数据结构验证 test\_execution\_plan.py 策略决策逻辑验证
+
+最后更新: 2026-05-05
