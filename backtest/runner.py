@@ -185,6 +185,18 @@ class BacktestRunner:
 
         self._process_dividends(snapshot, holdings)
 
+        dividend_reinvest_actions = self.strategy_adapter.reinvest_dividends(
+            snapshot=snapshot,
+            simulator=self.simulator,
+            current_holdings=holdings,
+            total_value=total_value
+        )
+
+        if dividend_reinvest_actions:
+            print(f"\n【分红再投资】日期: {date.strftime('%Y-%m-%d')}")
+            for action in dividend_reinvest_actions:
+                print(f"  - 分红再投资买入: {action['stock_code']} @ {action['price']:.2f}")
+
         actions, _ = self.strategy_adapter.execute_rebalance(
             snapshot=snapshot,
             simulator=self.simulator,
