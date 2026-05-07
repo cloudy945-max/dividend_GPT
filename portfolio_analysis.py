@@ -1,5 +1,144 @@
 import pandas as pd
 import os
+from datetime import datetime
+
+
+def calculate_irr(transactions, snapshot, current_date=None):
+    """
+    计算内部收益率 (IRR)
+    
+    Args:
+        transactions: 交易记录DataFrame
+        snapshot: 市场数据列表，用于计算当前市值
+        current_date: 当前日期，默认使用datetime.now()
+    
+    Returns:
+        dict: 包含整体IRR和分类IRR的字典
+    """
+    if current_date is None:
+        current_date = datetime.now()
+    
+    if transactions.empty:
+        return {
+            'overall_irr': None,
+            'new_cash_irr': None,
+            'reinvest_irr': None,
+            'total_invested': 0.0,
+            'new_cash_invested': 0.0,
+            'reinvest_amount': 0.0
+        }
+    
+    transactions = transactions.sort_values('date')
+    start_date = transactions['date'].min()
+    
+    start_months = start_date.year * 12 + start_date.month
+    end_months = current_date.year * 12 + current_date.month
+    total_months = end_months - start_months
+    
+    price_map = {}
+    for stock in snapshot:
+        stock_name = stock.get("stock_name")
+        price = stock.get("price")
+        if stock_name and price is not None:
+            price_map[stock_name] = price
+    
+    holdings_value = 0.0
+    holdings_shares = {}
+    for _, row in transactions.iterrows():
+        stock_name = row['stock_name']
+        shares = row['shares']
+        type_ = row['type']
+        
+        if stock_name not in holdings_shares:
+            holdings_shares[stock_name] = 0
+        
+        if type_ in ['buy', 'dividend_reinvest']:
+            holdings_shares[stock_name] += shares
+        elif type_ == 'sell':
+            holdings_shares[stock_name] -= shares
+    
+    for stock_name, shares in holdings_shares.items():
+        if shares > 0 and stock_name in price_map:
+            holdings_value += shares * price_map[stock_name]
+    
+    cash_flows = []
+    cash_flows_new = []
+    cash_flows_reinvest = []
+    
+    for _, row in transactions.iterrows():
+        month_idx = (row['date'].year * 12 + row['date'].month) - start_months
+        amount = row['cash_flow']
+        
+        cash_flows.append((month_idx, amount))
+        
+        source = row.get('source', 'new_cash')
+        if source == 'new_cash':
+            cash_flows_new.append((month_idx, amount))
+        elif source == 'dividend_reinvest':
+            cash_flows_reinvest.append((month_idx, amount))
+    
+    if total_months > 0 and holdings_value > 0:
+        cash_flows.append((total_months, holdings_value))
+    
+    def npv(rate, flows):
+        return sum(cf / (1 + rate) ** (t / 12) for t, cf in flows)
+    
+    def find_irr(flows):
+        if len(flows) < 2:
+            return None
+        
+        total_flows = sum(abs(cf) for _, cf in flows)
+        if total_flows == 0:
+            return None
+        
+        try:
+            irr = brentq(npv, -0.99, 10.0, args=(flows,), maxiter=1000)
+            return irr
+        except:
+            return None
+    
+    try:
+        from scipy.optimize import brentq
+    except ImportError:
+        def find_irr_simple(flows):
+            if len(flows) < 2:
+                return None
+            total_npv_pos = npv(0.01, flows)
+            total_npv_neg = npv(-0.5, flows)
+            if total_npv_pos * total_npv_neg > 0:
+                return None
+            low, high = -0.5, 0.5
+            for _ in range(100):
+                mid = (low + high) / 2
+                if npv(mid, flows) == 0:
+                    return mid
+                elif npv(low, flows) * npv(mid, flows) < 0:
+                    high = mid
+                else:
+                    low = mid
+            return (low + high) / 2
+        find_irr = find_irr_simple
+    
+    overall_irr = find_irr(cash_flows) if cash_flows else None
+    new_cash_irr = find_irr(cash_flows_new) if cash_flows_new else None
+    reinvest_irr = find_irr(cash_flows_reinvest) if cash_flows_reinvest else None
+    
+    total_invested = sum(tx['cash_flow'] for _, tx in transactions.iterrows() 
+                         if tx['type'] in ['buy', 'dividend_reinvest'])
+    new_cash_invested = sum(tx['cash_flow'] for _, tx in transactions.iterrows() 
+                           if tx.get('source') == 'new_cash' and tx['type'] == 'buy')
+    reinvest_amount = sum(tx['cash_flow'] for _, tx in transactions.iterrows() 
+                         if tx['type'] == 'dividend_reinvest')
+    
+    return {
+        'overall_irr': overall_irr,
+        'new_cash_irr': new_cash_irr,
+        'reinvest_irr': reinvest_irr,
+        'total_invested': abs(total_invested),
+        'new_cash_invested': abs(new_cash_invested),
+        'reinvest_amount': abs(reinvest_amount),
+        'total_months': total_months
+    }
 
 
 def calculate_annual_dividend(holdings, dividends):
@@ -59,7 +198,7 @@ def calculate_annual_dividend(holdings, dividends):
     return annual_dividend
 
 
-def analyze_portfolio(holdings, snapshot, dividends=None):
+def analyze_portfolio(holdings, snapshot, dividends=None, transactions=None):
     """
     分析投资组合
     
@@ -67,6 +206,7 @@ def analyze_portfolio(holdings, snapshot, dividends=None):
         holdings: 持仓DataFrame，包含列：stock_name, shares, cost_price, total_cost
         snapshot: 市场数据列表，每个元素包含：stock_name, price, pb
         dividends: 分红DataFrame（可选），包含列：date, stock_name, dividend_per_share
+        transactions: 交易记录DataFrame（可选），用于计算IRR
     
     Returns:
         dict: 包含汇总和各持仓详细信息的分析结果
@@ -228,6 +368,10 @@ def analyze_portfolio(holdings, snapshot, dividends=None):
     if has_warning:
         print("Warning: 部分资产缺少价格，估值可能不准确")
     
+    irr_analysis = None
+    if transactions is not None and not transactions.empty:
+        irr_analysis = calculate_irr(transactions, snapshot)
+    
     return {
         "total_value": total_value,
         "total_cost": total_cost,
@@ -242,7 +386,8 @@ def analyze_portfolio(holdings, snapshot, dividends=None):
         "deviation": deviation,
         "deviation_map": deviation_map,
         "needs_rebalance": needs_rebalance,
-        "has_warning": has_warning
+        "has_warning": has_warning,
+        "irr_analysis": irr_analysis
     }
 
 
@@ -323,6 +468,22 @@ def print_dashboard(analysis):
         print(f"现金流质量：{analysis['cashflow_quality']*100:.1f}%")
     else:
         print("现金流质量：--")
+    
+    irr = analysis.get('irr_analysis')
+    if irr:
+        print("\n---- 内部收益率 (IRR) ----")
+        if irr['overall_irr'] is not None:
+            print(f"整体 IRR (年化): {irr['overall_irr']*100:.2f}%")
+        else:
+            print("整体 IRR: 暂无数据")
+        
+        if irr['new_cash_irr'] is not None:
+            print(f"新增资金 IRR: {irr['new_cash_irr']*100:.2f}%")
+        if irr['reinvest_irr'] is not None:
+            print(f"红利再投资 IRR: {irr['reinvest_irr']*100:.2f}%")
+        
+        if irr['total_months'] and irr['total_months'] > 0:
+            print(f"(持有期: {irr['total_months']}个月)")
 
     if analysis.get('needs_rebalance'):
         print("\n! 需要再平衡！")

@@ -25,10 +25,16 @@ class PortfolioManager:
             self.transactions = pd.read_csv(self.transactions_path, encoding='utf-8-sig')
             if 'cash_flow' not in self.transactions.columns:
                 self.transactions['cash_flow'] = 0.0
+            if 'source' not in self.transactions.columns:
+                self.transactions['source'] = 'new_cash'
+            if 'dividend_amount' not in self.transactions.columns:
+                self.transactions['dividend_amount'] = 0.0
+            if 'dividend_stock' not in self.transactions.columns:
+                self.transactions['dividend_stock'] = ''
             if not self.transactions.empty:
                 self.transactions['date'] = pd.to_datetime(self.transactions['date'])
         else:
-            self.transactions = pd.DataFrame(columns=['date', 'type', 'stock_name', 'price', 'shares', 'cash_flow'])
+            self.transactions = pd.DataFrame(columns=['date', 'type', 'stock_name', 'price', 'shares', 'cash_flow', 'source', 'dividend_amount', 'dividend_stock'])
         
         if os.path.exists(self.dividends_path):
             self.dividends = pd.read_csv(self.dividends_path, encoding='utf-8-sig')
@@ -36,18 +42,70 @@ class PortfolioManager:
                 self.dividends['date'] = pd.to_datetime(self.dividends['date'])
         else:
             self.dividends = pd.DataFrame(columns=['date', 'stock_name', 'dividend_per_share'])
+        
+        self.dividend_pool = 0.0
+        self._calculate_dividend_pool()
+    
+    def _calculate_dividend_pool(self):
+        if self.dividends.empty or self.holdings.empty:
+            self.dividend_pool = 0.0
+            return
+        
+        holdings_shares = {}
+        for _, row in self.holdings.iterrows():
+            holdings_shares[row['stock_name']] = row['shares']
+        
+        total_dividend = 0.0
+        for _, row in self.dividends.iterrows():
+            stock_name = row['stock_name']
+            if stock_name in holdings_shares:
+                total_dividend += row['dividend_per_share'] * holdings_shares[stock_name]
+        
+        reinvested = self.transactions[self.transactions['type'] == 'dividend_reinvest']['dividend_amount'].sum()
+        
+        self.dividend_pool = total_dividend - reinvested
+    
+    def get_dividend_pool(self):
+        return self.dividend_pool
+    
+    def get_dividend_pool_breakdown(self):
+        if self.dividends.empty or self.holdings.empty:
+            return {'total': 0.0, 'reinvested': 0.0, 'available': 0.0, 'by_stock': {}}
+        
+        holdings_shares = {}
+        for _, row in self.holdings.iterrows():
+            holdings_shares[row['stock_name']] = row['shares']
+        
+        by_stock = {}
+        for _, row in self.dividends.iterrows():
+            stock_name = row['stock_name']
+            if stock_name in holdings_shares:
+                amount = row['dividend_per_share'] * holdings_shares[stock_name]
+                by_stock[stock_name] = by_stock.get(stock_name, 0.0) + amount
+        
+        total = sum(by_stock.values())
+        reinvested = self.transactions[self.transactions['type'] == 'dividend_reinvest']['dividend_amount'].sum()
+        
+        return {
+            'total': total,
+            'reinvested': reinvested,
+            'available': total - reinvested,
+            'by_stock': by_stock
+        }
     
     def save_data(self):
         self.holdings.to_csv(self.holdings_path, index=False, encoding='utf-8-sig')
         self.transactions.to_csv(self.transactions_path, index=False, encoding='utf-8-sig')
         self.dividends.to_csv(self.dividends_path, index=False, encoding='utf-8-sig')
     
-    def add_transaction(self, date, type_, stock_name, price, shares):
+    def add_transaction(self, date, type_, stock_name, price, shares, source='new_cash', dividend_amount=0.0, dividend_stock=''):
         date = pd.to_datetime(date)
         if type_ == 'buy':
             cash_flow = - price * shares
         elif type_ == 'sell':
             cash_flow = price * shares
+        elif type_ == 'dividend_reinvest':
+            cash_flow = - price * shares
         else:
             cash_flow = 0.0
         new_transaction = pd.DataFrame({
@@ -56,7 +114,10 @@ class PortfolioManager:
             'stock_name': [stock_name],
             'price': [price],
             'shares': [shares],
-            'cash_flow': [cash_flow]
+            'cash_flow': [cash_flow],
+            'source': [source],
+            'dividend_amount': [dividend_amount],
+            'dividend_stock': [dividend_stock]
         })
         self.transactions = pd.concat([self.transactions, new_transaction], ignore_index=True)
         
@@ -64,6 +125,9 @@ class PortfolioManager:
             self._update_holdings_buy(stock_name, shares, price)
         elif type_ == 'sell':
             self._update_holdings_sell(stock_name, shares)
+        elif type_ == 'dividend_reinvest':
+            self.dividend_pool -= dividend_amount
+            self._update_holdings_buy(stock_name, shares, price)
         
         self.save_data()
     
@@ -108,6 +172,7 @@ class PortfolioManager:
             'dividend_per_share': [dividend_per_share]
         })
         self.dividends = pd.concat([self.dividends, new_dividend], ignore_index=True)
+        self._calculate_dividend_pool()
         self.save_data()
     
     def get_holdings(self):

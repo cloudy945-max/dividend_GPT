@@ -4,6 +4,7 @@
 """
 
 import sys
+from datetime import datetime
 from portfolio import PortfolioManager
 from market_data import get_multiple_market_data, generate_execution_plan, ALLOWED_STOCKS, get_stock_name
 from portfolio_analysis import analyze_portfolio, print_dashboard
@@ -260,6 +261,7 @@ def menu_run_analysis(portfolio):
         return
 
     dividends = portfolio.get_dividends()
+    transactions = portfolio.get_transactions()
 
     try:
         stock_list = holdings['stock_name'].tolist()
@@ -267,7 +269,7 @@ def menu_run_analysis(portfolio):
         snapshot = get_multiple_market_data(stock_list)
 
         print("\n分析结果：")
-        analysis = analyze_portfolio(holdings, snapshot, dividends)
+        analysis = analyze_portfolio(holdings, snapshot, dividends, transactions)
         print_dashboard(analysis)
 
         # 生成图表
@@ -400,6 +402,200 @@ def menu_clear_data(portfolio):
         print("取消操作")
 
 
+def menu_dividend_reinvest(portfolio):
+    """分红再投资管理子菜单"""
+    while True:
+        print("\n" + "="*40)
+        print("  💰 分红再投资管理")
+        print("="*40)
+        
+        pool_info = portfolio.get_dividend_pool_breakdown()
+        print(f"\n累计待投资分红: ¥{pool_info['available']:,.2f}")
+        print(f"已投资分红: ¥{pool_info['reinvested']:,.2f}")
+        print(f"分红总计: ¥{pool_info['total']:,.2f}")
+        
+        if pool_info['by_stock']:
+            print("\n各股票累计分红:")
+            for stock, amount in pool_info['by_stock'].items():
+                reinvested = 0
+                reinvest_txs = portfolio.transactions[
+                    (portfolio.transactions['type'] == 'dividend_reinvest') & 
+                    (portfolio.transactions['dividend_stock'] == stock)
+                ]
+                if not reinvest_txs.empty:
+                    reinvested = reinvest_txs['dividend_amount'].sum()
+                print(f"  {stock}: ¥{amount:,.2f} (已再投资: ¥{reinvested:,.2f})")
+        
+        print("\n请选择操作：")
+        print("1. 执行分红再投资")
+        print("2. 查看再投资历史")
+        print("3. 查看资金来源分析")
+        print("0. 返回主菜单")
+        
+        choice = input("\n输入选项编号：").strip()
+        
+        if choice == "1":
+            menu_execute_reinvest(portfolio)
+        elif choice == "2":
+            menu_view_reinvest_history(portfolio)
+        elif choice == "3":
+            menu_view_source_analysis(portfolio)
+        elif choice == "0":
+            break
+        else:
+            print("❌ 无效选项")
+
+
+def menu_execute_reinvest(portfolio):
+    """执行分红再投资"""
+    pool_info = portfolio.get_dividend_pool_breakdown()
+    available = pool_info['available']
+    
+    if available <= 0:
+        print("\n暂无待投资的分红资金")
+        return
+    
+    holdings = portfolio.get_holdings()
+    if holdings.empty:
+        print("\n当前无持仓，请先买入股票")
+        return
+    
+    print("\n--- 执行分红再投资 ---")
+    
+    print("\n当前持仓 (可作为再投资标的):")
+    holdings_list = holdings['stock_name'].tolist()
+    for i, stock in enumerate(holdings_list, 1):
+        shares = holdings[holdings['stock_name'] == stock]['shares'].values[0]
+        print(f"  {i}. {stock} ({shares}股)")
+    
+    print(f"\n可用分红资金: ¥{available:,.2f}")
+    
+    try:
+        stock_name = input("\n请输入要购买的股票名称：").strip()
+        
+        if stock_name not in holdings_list:
+            print(f"❌ {stock_name} 不在持仓列表中")
+            return
+        
+        price_input = input(f"请输入买入价格（或直接回车使用当前市价）：").strip()
+        
+        if price_input:
+            price = float(price_input)
+        else:
+            print("正在获取当前市价...")
+            snapshot = get_multiple_market_data([stock_name])
+            valid_snapshot = [s for s in snapshot if 'error' not in s and s.get('price') is not None]
+            if not valid_snapshot:
+                print("❌ 无法获取市场数据")
+                return
+            price = valid_snapshot[0]['price']
+            print(f"当前市价: ¥{price:.2f}")
+        
+        lot_cost = price * 100
+        if available < lot_cost:
+            print(f"❌ 可用分红 ¥{available:.2f} 不足以购买1手 (需 ¥{lot_cost:.2f})")
+            return
+        
+        max_shares = int(available // (price * 100 + price * 100 * 0.0003)) // 100 * 100
+        print(f"\n每手100股，最低买入1手 ¥{lot_cost:.2f}")
+        print(f"可用资金最多可买 {max_shares // 100} 手")
+        
+        shares_input = input("请输入购买股数（100的倍数）或直接回车使用最大可买：").strip()
+        
+        if shares_input:
+            shares = int(shares_input)
+        else:
+            shares = max_shares
+        
+        if shares < 100:
+            print("❌ 至少需要购买100股")
+            return
+        
+        shares = (shares // 100) * 100
+        cost = price * shares
+        commission = cost * 0.0003
+        total_cost = cost + commission
+        
+        print(f"\n=== 确认信息 ===")
+        print(f"股票: {stock_name}")
+        print(f"买入价: ¥{price:.2f}")
+        print(f"股数: {shares}股")
+        print(f"金额: ¥{cost:.2f}")
+        print(f"手续费: ¥{commission:.2f}")
+        print(f"总计: ¥{total_cost:.2f}")
+        
+        confirm = input("\n确认执行？(y/n): ").strip().lower()
+        
+        if confirm == 'y':
+            portfolio.add_transaction(
+                date=datetime.now().strftime('%Y-%m-%d'),
+                type_='dividend_reinvest',
+                stock_name=stock_name,
+                price=price,
+                shares=shares,
+                source='dividend_reinvest',
+                dividend_amount=total_cost,
+                dividend_stock=stock_name
+            )
+            print("✅ 分红再投资成功！")
+        else:
+            print("已取消")
+    
+    except ValueError:
+        print("❌ 输入无效")
+    except Exception as e:
+        print(f"❌ 执行失败: {e}")
+
+
+def menu_view_reinvest_history(portfolio):
+    """查看再投资历史"""
+    print("\n--- 再投资历史 ---")
+    
+    reinvest_txs = portfolio.transactions[portfolio.transactions['type'] == 'dividend_reinvest']
+    
+    if reinvest_txs.empty:
+        print("暂无再投资记录")
+        return
+    
+    reinvest_txs = reinvest_txs.sort_values('date', ascending=False)
+    
+    print(f"\n{'日期':<12} {'股票':<10} {'价格':>8} {'股数':>6} {'金额':>10} {'来自分红'}")
+    print("-" * 70)
+    
+    for _, tx in reinvest_txs.iterrows():
+        date_str = format_date(tx['date'])
+        print(f"{date_str:<12} {tx['stock_name']:<10} ¥{tx['price']:>7.2f} {tx['shares']:>6} ¥{abs(tx['cash_flow']):>9.2f} {tx['dividend_stock']}")
+
+
+def menu_view_source_analysis(portfolio):
+    """查看资金来源分析"""
+    print("\n--- 资金来源分析 ---")
+    
+    transactions = portfolio.get_transactions()
+    
+    if transactions.empty:
+        print("暂无交易记录")
+        return
+    
+    new_cash_txs = transactions[transactions['source'] == 'new_cash']
+    reinvest_txs = transactions[transactions['type'] == 'dividend_reinvest']
+    
+    new_cash_total = sum(tx['cash_flow'] for _, tx in new_cash_txs.iterrows() if tx['type'] == 'buy')
+    reinvest_total = sum(abs(tx['cash_flow']) for _, tx in reinvest_txs.iterrows())
+    
+    print(f"\n新增资金买入:")
+    print(f"  次数: {len(new_cash_txs[new_cash_txs['type'] == 'buy'])}")
+    print(f"  金额: ¥{abs(new_cash_total):,.2f}")
+    
+    print(f"\n红利再投资:")
+    print(f"  次数: {len(reinvest_txs)}")
+    print(f"  金额: ¥{reinvest_total:,.2f}")
+    
+    if reinvest_total > 0:
+        reinvest_pct = reinvest_total / (abs(new_cash_total) + reinvest_total) * 100
+        print(f"  占比: {reinvest_pct:.1f}%")
+
+
 def main():
     print("="*50)
     print("  投资组合管理工具")
@@ -418,8 +614,9 @@ def main():
         print("6. 查看分红记录")
         print("7. 📊 运行分析")
         print("8. 📈 月度买入建议")
-        print("9. ⚠️  清空所有数据")
-        print("0. 退出")
+        print("9. 💰 分红再投资")
+        print("0. ⚠️  清空所有数据")
+        print("q. 退出")
         print_separator()
 
         choice = input("输入选项编号：").strip()
@@ -441,8 +638,10 @@ def main():
         elif choice == "8":
             menu_buy_suggestion(portfolio)
         elif choice == "9":
-            menu_clear_data(portfolio)
+            menu_dividend_reinvest(portfolio)
         elif choice == "0":
+            menu_clear_data(portfolio)
+        elif choice == "q":
             print("\n👋 再见！")
             sys.exit(0)
         else:
