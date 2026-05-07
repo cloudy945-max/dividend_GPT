@@ -252,6 +252,83 @@ class StrategyAdapter:
 
         return actions, cash_pool
 
+    def select_stock_for_reinvest(self, snapshot, simulator, current_holdings, total_value):
+        """根据策略选择最适合分红的再投资股票"""
+        candidates = []
+        
+        for stock_code in self.target_weights.keys():
+            if stock_code == "159307":
+                continue
+
+            price = self._get_price(snapshot, stock_code)
+            if price is None or price <= 0:
+                continue
+
+            can_buy, lot_cost, total_cost = simulator.can_buy_one_lot(stock_code, {stock_code: price})
+            if not can_buy:
+                continue
+
+            current_value = current_holdings.get(stock_code, 0.0)
+            deviation = self.calculate_deviation(current_value, self.target_weights[stock_code], total_value)
+
+            priority = 1.0
+            if self.should_strong_buy(stock_code, snapshot):
+                priority = 2.0
+
+            score = deviation * priority
+            
+            candidates.append({
+                'stock_code': stock_code,
+                'price': price,
+                'deviation': deviation,
+                'priority': priority,
+                'score': score,
+                'lot_cost': lot_cost
+            })
+        
+        if not candidates:
+            return None
+        
+        candidates.sort(key=lambda x: x['score'], reverse=True)
+        
+        for candidate in candidates:
+            if candidate['deviation'] >= MIN_DEVIATION_TO_BUY_DEFAULT * 0.5:
+                return candidate
+        
+        return candidates[0] if candidates else None
+
+    def reinvest_dividends(self, snapshot, simulator, current_holdings, total_value):
+        """执行分红再投资：检查现金是否足够买1手，按策略选股"""
+        reinvest_actions = []
+        
+        while True:
+            best_candidate = self.select_stock_for_reinvest(
+                snapshot, simulator, current_holdings, total_value
+            )
+            
+            if best_candidate is None:
+                break
+            
+            stock_code = best_candidate['stock_code']
+            price = best_candidate['price']
+            
+            success = simulator.reinvest_dividend(stock_code, price)
+            
+            if success:
+                reinvest_actions.append({
+                    'stock_code': stock_code,
+                    'price': price,
+                    'action': 'dividend_reinvest'
+                })
+                
+                cost = best_candidate['lot_cost']
+                current_holdings[stock_code] = current_holdings.get(stock_code, 0.0) + cost
+                total_value += cost
+            else:
+                break
+        
+        return reinvest_actions
+
     def _get_price(self, snapshot, stock_code):
         for stock in snapshot:
             if stock.get('stock_code') == stock_code:

@@ -183,6 +183,86 @@ class TradeSimulator:
             return 0
         return self.positions[stock_code]['shares']
 
+    def can_buy_one_lot(self, stock_code, price_map):
+        """检查当前现金是否足够购买某股票至少1手"""
+        price = price_map.get(stock_code, 0)
+        if price <= 0:
+            return False, 0, 0
+        lot_cost = price * 100
+        commission = lot_cost * self.commission_rate
+        total_cost = lot_cost + commission
+        if self.cash >= total_cost:
+            return True, lot_cost, total_cost
+        return False, lot_cost, total_cost
+
+    def reinvest_dividend(self, stock_code, price):
+        """使用现金购买股票进行分红再投资"""
+        lot_cost = price * 100
+        commission = lot_cost * self.commission_rate
+        total_cost = lot_cost + commission
+        
+        if total_cost > self.cash:
+            return False
+        
+        actual_lots = (int(self.cash // total_cost)) * 100
+        if actual_lots < 100:
+            return False
+        
+        actual_cost = actual_lots * price
+        actual_commission = actual_cost * self.commission_rate
+        total_actual_cost = actual_cost + actual_commission
+        
+        if stock_code in self.positions:
+            old_shares = self.positions[stock_code]['shares']
+            old_cost = self.positions[stock_code]['cost']
+            new_cost = old_cost + actual_cost
+            new_shares = old_shares + actual_lots
+            new_avg_price = new_cost / new_shares
+            self.positions[stock_code] = {
+                'shares': new_shares,
+                'cost': new_cost,
+                'avg_price': new_avg_price
+            }
+        else:
+            self.positions[stock_code] = {
+                'shares': actual_lots,
+                'cost': actual_cost,
+                'avg_price': price
+            }
+        
+        self.cash -= total_actual_cost
+        
+        self.transactions.append({
+            'date': self.current_date,
+            'type': 'dividend_reinvest',
+            'stock_code': stock_code,
+            'shares': actual_lots,
+            'price': price,
+            'cost': actual_cost,
+            'commission': actual_commission,
+            'cash_after': self.cash,
+            'source': 'dividend'
+        })
+        return True
+
+    def get_accumulated_dividends(self):
+        """获取累计收到的分红金额"""
+        return sum(d['amount'] for d in self.dividends_received)
+
+    def get_reinvest_stats(self):
+        """获取分红再投资统计"""
+        reinvest_txs = [tx for tx in self.transactions if tx.get('source') == 'dividend']
+        if not reinvest_txs:
+            return {'count': 0, 'total_amount': 0, 'stocks': []}
+        
+        total = sum(tx['cost'] for tx in reinvest_txs)
+        stocks = list(set(tx['stock_code'] for tx in reinvest_txs))
+        return {
+            'count': len(reinvest_txs),
+            'total_amount': total,
+            'stocks': stocks
+        }
+
 
 class BacktestEngine:
     def __init__(self, data_loader, strategy_adapter):
