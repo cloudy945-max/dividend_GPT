@@ -469,6 +469,32 @@ def print_dashboard(analysis):
     else:
         print("现金流质量：--")
     
+    # 分红统计板块
+    total_dividend = analysis.get('total_dividend_received', 0.0)
+    if total_dividend > 0:
+        print("\n---- 分红统计 ----")
+        print(f"累计收到分红: ¥{total_dividend:,.2f}")
+        
+        # 获取分红池信息（从分析结果中计算）
+        reinvested = 0.0
+        for pos in analysis['positions']:
+            # 从交易记录中计算已再投资金额
+            pass
+        
+        # 简化展示：显示总分红和再投资提示
+        irr = analysis.get('irr_analysis')
+        if irr:
+            reinvested = irr.get('reinvest_amount', 0.0)
+            available = total_dividend - reinvested
+            
+            print(f"  ├─ 已再投资: ¥{reinvested:,.2f}")
+            print(f"  └─ 待投资:   ¥{available:,.2f}", end="")
+            
+            if available > 500:
+                print(f" ⚠️  (可再投资)")
+            else:
+                print()
+    
     irr = analysis.get('irr_analysis')
     if irr:
         print("\n---- 内部收益率 (IRR) ----")

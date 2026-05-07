@@ -604,6 +604,11 @@ def main():
     portfolio = PortfolioManager()
 
     while True:
+        # 显示分红提醒
+        pool_info = portfolio.get_dividend_pool_breakdown()
+        if pool_info['available'] > 0:
+            print(f"\n💰 分红提醒: 待投资 ¥{pool_info['available']:,.2f} | 已再投资 ¥{pool_info['reinvested']:,.2f}")
+        
         print_separator()
         print("请选择操作：")
         print("1. 查看当前持仓")
