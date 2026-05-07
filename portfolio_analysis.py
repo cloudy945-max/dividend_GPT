@@ -25,7 +25,8 @@ def calculate_irr(transactions, snapshot, current_date=None):
             'reinvest_irr': None,
             'total_invested': 0.0,
             'new_cash_invested': 0.0,
-            'reinvest_amount': 0.0
+            'reinvest_amount': 0.0,
+            'total_months': 0
         }
     
     transactions = transactions.sort_values('date')
@@ -34,6 +35,17 @@ def calculate_irr(transactions, snapshot, current_date=None):
     start_months = start_date.year * 12 + start_date.month
     end_months = current_date.year * 12 + current_date.month
     total_months = end_months - start_months
+    
+    if total_months < 12:
+        return {
+            'overall_irr': None,
+            'new_cash_irr': None,
+            'reinvest_irr': None,
+            'total_invested': 0.0,
+            'new_cash_invested': 0.0,
+            'reinvest_amount': 0.0,
+            'total_months': total_months
+        }
     
     price_map = {}
     for stock in snapshot:
@@ -78,7 +90,14 @@ def calculate_irr(transactions, snapshot, current_date=None):
             cash_flows_reinvest.append((month_idx, amount))
     
     if total_months > 0 and holdings_value > 0:
-        cash_flows.append((total_months, holdings_value))
+        last_trans_month = None
+        if len(cash_flows) > 0:
+            last_trans_month = cash_flows[-1][0]
+        
+        if last_trans_month == total_months:
+            cash_flows.append((total_months + 1, holdings_value))
+        else:
+            cash_flows.append((total_months, holdings_value))
     
     def npv(rate, flows):
         return sum(cf / (1 + rate) ** (t / 12) for t, cf in flows)

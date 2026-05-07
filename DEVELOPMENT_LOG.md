@@ -1535,3 +1535,66 @@ for pos in analysis['positions']:
 ```
 
 最后更新: 2026-05-06
+
+***
+
+## \[2026-05-07] IRR计算异常修复
+
+现象 : 总收益率为正（+2.53%），但IRR显示为负数（-31.8%）
+
+根因 :
+
+1. 最后一次买入和当前市值计算在同一个月
+2. IRR是年化指标，7个月持有期太短
+   修复 :
+
+```
+# portfolio_analysis.py
+
+# 修复1：时间点冲突处理
+if last_trans_month == total_months:
+    cash_flows.append((total_months 
+    + 1, holdings_value))
+
+# 修复2：设置IRR计算门槛（持有期≥1年）
+if total_months < 12:
+    return {'overall_irr': 
+    None, ...}
+```
+
+验证 :
+
+指标 修复前 修复后 总收益率 +2.53% +2.53% IRR -31.8% 暂无数据
+
+## \[2026-05-07] 添加记录退出机制
+
+需求 : 用户误触添加记录后，无法中途退出返回到主菜单
+
+修复 :
+
+```
+# manage_portfolio.py
+
+# 修改输入函数，添加退出检测
+def get_valid_date(prompt):
+    while True:
+        date_str = input(prompt)
+        if date_str.lower() in 
+        ['q', 'quit']:
+            return None
+
+# 在各菜单函数中添加退出检测
+def menu_add_buy(portfolio):
+    date = get_valid_date("日期 
+    (YYYY-MM-DD): ")
+    if date is None:
+        print("已取消操作")
+        return
+```
+
+验证 :
+
+测试场景 结果 日期输入 q ✅ 退出并返回主菜单 股票名称输入 q ✅ 退出并返回主菜单 正常输入数据 ✅ 成功添加记录
+
+最后更新: 2026-05-07
+

@@ -116,41 +116,49 @@ def print_table(df, chinese_columns=True):
 
 
 def get_valid_date(prompt):
-    """获取有效的日期输入"""
+    """获取有效的日期输入，输入 'q' 或 'quit' 退出"""
     from datetime import datetime
     while True:
         date_str = input(prompt)
+        if date_str.lower() in ['q', 'quit']:
+            return None
         try:
             datetime.strptime(date_str, '%Y-%m-%d')
             return date_str
         except ValueError:
-            print("❌ 日期格式错误，请输入 YYYY-MM-DD 格式")
+            print("❌ 日期格式错误，请输入 YYYY-MM-DD 格式（输入 q 退出）")
 
 
 def get_valid_float(prompt):
-    """获取有效的浮点数输入"""
+    """获取有效的浮点数输入，输入 'q' 或 'quit' 退出"""
     while True:
         try:
-            value = float(input(prompt))
+            value = input(prompt)
+            if value.lower() in ['q', 'quit']:
+                return None
+            value = float(value)
             if value < 0:
                 print("❌ 值不能为负数")
                 continue
             return value
         except ValueError:
-            print("❌ 请输入有效的数字")
+            print("❌ 请输入有效的数字（输入 q 退出）")
 
 
 def get_valid_int(prompt):
-    """获取有效的整数输入"""
+    """获取有效的整数输入，输入 'q' 或 'quit' 退出"""
     while True:
         try:
-            value = int(input(prompt))
+            value = input(prompt)
+            if value.lower() in ['q', 'quit']:
+                return None
+            value = int(value)
             if value < 0:
                 print("❌ 值不能为负数")
                 continue
             return value
         except ValueError:
-            print("❌ 请输入有效的整数")
+            print("❌ 请输入有效的整数（输入 q 退出）")
 
 
 def menu_view_holdings(portfolio):
@@ -189,14 +197,28 @@ def menu_add_buy(portfolio):
     print("-"*30)
 
     date = get_valid_date("日期 (YYYY-MM-DD): ")
-    stock_name = input("股票名称：").strip()
+    if date is None:
+        print("已取消操作")
+        return
+
+    stock_name = input("股票名称（输入 q 退出）：").strip()
+    if stock_name.lower() == 'q':
+        print("已取消操作")
+        return
 
     if not stock_name:
         print("❌ 股票名称不能为空")
         return
 
     price = get_valid_float("买入价格：")
+    if price is None:
+        print("已取消操作")
+        return
+
     shares = get_valid_int("买入股数：")
+    if shares is None:
+        print("已取消操作")
+        return
 
     try:
         portfolio.add_transaction(date, 'buy', stock_name, price, shares)
@@ -211,14 +233,28 @@ def menu_add_sell(portfolio):
     print("-"*30)
 
     date = get_valid_date("日期 (YYYY-MM-DD): ")
-    stock_name = input("股票名称：").strip()
+    if date is None:
+        print("已取消操作")
+        return
+
+    stock_name = input("股票名称（输入 q 退出）：").strip()
+    if stock_name.lower() == 'q':
+        print("已取消操作")
+        return
 
     if not stock_name:
         print("❌ 股票名称不能为空")
         return
 
     price = get_valid_float("卖出价格：")
+    if price is None:
+        print("已取消操作")
+        return
+
     shares = get_valid_int("卖出股数：")
+    if shares is None:
+        print("已取消操作")
+        return
 
     try:
         portfolio.add_transaction(date, 'sell', stock_name, price, shares)
@@ -235,13 +271,23 @@ def menu_add_dividend(portfolio):
     print("-"*30)
 
     date = get_valid_date("日期 (YYYY-MM-DD): ")
-    stock_name = input("股票名称：").strip()
+    if date is None:
+        print("已取消操作")
+        return
+
+    stock_name = input("股票名称（输入 q 退出）：").strip()
+    if stock_name.lower() == 'q':
+        print("已取消操作")
+        return
 
     if not stock_name:
         print("❌ 股票名称不能为空")
         return
 
     dividend_per_share = get_valid_float("每股分红：")
+    if dividend_per_share is None:
+        print("已取消操作")
+        return
 
     try:
         portfolio.add_dividend(date, stock_name, dividend_per_share)
