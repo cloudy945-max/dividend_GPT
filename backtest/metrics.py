@@ -16,7 +16,12 @@ def calculate_metrics(history):
             "annual_return": 年化收益,
             "max_drawdown": 最大回撤,
             "volatility": 波动率,
-            "sharpe": 夏普比率
+            "sharpe": 夏普比率,
+            "calmar": Calmar比率,
+            "sortino": Sortino比率,
+            "irr": 内部收益率,
+            "win_rate": 胜率,
+            "profit_factor": 盈利因子
         }
     """
     if not history or len(history) < 2:
@@ -25,7 +30,12 @@ def calculate_metrics(history):
             "annual_return": 0.0,
             "max_drawdown": 0.0,
             "volatility": 0.0,
-            "sharpe": 0.0
+            "sharpe": 0.0,
+            "calmar": 0.0,
+            "sortino": 0.0,
+            "irr": 0.0,
+            "win_rate": 0.0,
+            "profit_factor": 0.0
         }
 
     df = pd.DataFrame(history)
@@ -53,13 +63,105 @@ def calculate_metrics(history):
     mean_return = np.mean(returns) * 252 if len(returns) > 0 else 0.0
     sharpe = (mean_return - 0.03) / volatility if volatility > 0 else 0.0
 
+    calmar = annual_return / abs(max_drawdown) if max_drawdown != 0 else 0.0
+
+    negative_returns = returns[returns < 0]
+    downside_std = np.std(negative_returns) * np.sqrt(252) if len(negative_returns) > 0 else 0.0
+    sortino = (mean_return - 0.03) / downside_std if downside_std > 0 else 0.0
+
+    irr = calculate_irr(history)
+
+    win_rate = calculate_win_rate(returns)
+    profit_factor = calculate_profit_factor(returns)
+
     return {
         "total_return": total_return,
         "annual_return": annual_return,
         "max_drawdown": max_drawdown,
         "volatility": volatility,
-        "sharpe": sharpe
+        "sharpe": sharpe,
+        "calmar": calmar,
+        "sortino": sortino,
+        "irr": irr,
+        "win_rate": win_rate,
+        "profit_factor": profit_factor
     }
+
+
+def calculate_irr(history):
+    """
+    计算内部收益率(IRR)
+    
+    Args:
+        history: 回测历史列表
+    
+    Returns:
+        IRR值
+    """
+    if not history or len(history) < 2:
+        return 0.0
+
+    cash_flows = []
+    dates = []
+    
+    for record in history:
+        dates.append(pd.to_datetime(record['date']))
+        cash_flows.append(record['total_value'])
+    
+    if len(cash_flows) < 2:
+        return 0.0
+    
+    initial_value = cash_flows[0]
+    final_value = cash_flows[-1]
+    
+    days = (dates[-1] - dates[0]).days
+    years = days / 365.0 if days > 0 else 1.0
+    
+    try:
+        irr = (final_value / initial_value) ** (1 / years) - 1
+    except (ZeroDivisionError, ValueError):
+        irr = 0.0
+    
+    return irr
+
+
+def calculate_win_rate(returns):
+    """
+    计算胜率
+    
+    Args:
+        returns: 收益率数组
+    
+    Returns:
+        胜率
+    """
+    if len(returns) == 0:
+        return 0.0
+    
+    positive_returns = returns[returns > 0]
+    return len(positive_returns) / len(returns)
+
+
+def calculate_profit_factor(returns):
+    """
+    计算盈利因子
+    
+    Args:
+        returns: 收益率数组
+    
+    Returns:
+        盈利因子
+    """
+    if len(returns) == 0:
+        return 0.0
+    
+    gross_profit = np.sum(returns[returns > 0])
+    gross_loss = np.abs(np.sum(returns[returns < 0]))
+    
+    if gross_loss == 0:
+        return float('inf') if gross_profit > 0 else 0.0
+    
+    return gross_profit / gross_loss
 
 
 class BacktestMetrics:
@@ -147,6 +249,27 @@ class BacktestMetrics:
         sharpe = (mean_return - risk_free_rate) / volatility
         return sharpe
 
+    def calculate_sortino_ratio(self, risk_free_rate=0.03):
+        if len(self.portfolio_values) < 2:
+            return 0.0
+
+        portfolio_values = np.array(self.portfolio_values)
+        returns = np.diff(portfolio_values) / portfolio_values[:-1]
+        returns = returns[~np.isnan(returns) & ~np.isinf(returns)]
+
+        if len(returns) == 0:
+            return 0.0
+
+        mean_return = np.mean(returns) * 252
+        negative_returns = returns[returns < 0]
+        downside_std = np.std(negative_returns) * np.sqrt(252) if len(negative_returns) > 0 else 0.0
+
+        if downside_std == 0:
+            return 0.0
+
+        sortino = (mean_return - risk_free_rate) / downside_std
+        return sortino
+
     def calculate_max_drawdown(self):
         if len(self.portfolio_values) < 2:
             return 0.0, None, None
@@ -168,45 +291,70 @@ class BacktestMetrics:
 
         return max_dd, peak_date, trough_date
 
+    def calculate_calmar_ratio(self):
+        if len(self.portfolio_values) < 2:
+            return 0.0
+
+        returns = self.calculate_returns()
+        annualized_return = returns['annualized_return']
+        
+        max_dd, _, _ = self.calculate_max_drawdown()
+        
+        if max_dd == 0:
+            return 0.0
+        
+        return annualized_return / abs(max_dd)
+
+    def calculate_irr(self):
+        if len(self.portfolio_values) < 2:
+            return 0.0
+
+        initial_value = self.portfolio_values[0]
+        final_value = self.portfolio_values[-1]
+        
+        dates = pd.to_datetime(self.dates)
+        days = (dates[-1] - dates[0]).days
+        years = days / 365.0 if days > 0 else 1.0
+        
+        try:
+            irr = (final_value / initial_value) ** (1 / years) - 1
+        except (ZeroDivisionError, ValueError):
+            irr = 0.0
+        
+        return irr
+
     def calculate_win_rate(self):
-        if not self.transactions:
+        if len(self.portfolio_values) < 2:
             return 0.0
 
-        all_transactions = pd.concat(self.transactions, ignore_index=True)
-        sell_transactions = all_transactions[all_transactions['type'] == 'sell']
+        portfolio_values = np.array(self.portfolio_values)
+        returns = np.diff(portfolio_values) / portfolio_values[:-1]
+        returns = returns[~np.isnan(returns) & ~np.isinf(returns)]
 
-        if sell_transactions.empty:
+        if len(returns) == 0:
             return 0.0
 
-        winning_trades = (sell_transactions['profit'] > 0).sum()
-        total_trades = len(sell_transactions)
-
-        return winning_trades / total_trades if total_trades > 0 else 0.0
+        winning_periods = (returns > 0).sum()
+        return winning_periods / len(returns)
 
     def calculate_profit_factor(self):
-        if not self.transactions:
+        if len(self.portfolio_values) < 2:
             return 0.0
 
-        all_transactions = pd.concat(self.transactions, ignore_index=True)
-        sell_transactions = all_transactions[all_transactions['type'] == 'sell']
+        portfolio_values = np.array(self.portfolio_values)
+        returns = np.diff(portfolio_values) / portfolio_values[:-1]
+        returns = returns[~np.isnan(returns) & ~np.isinf(returns)]
 
-        if sell_transactions.empty:
+        if len(returns) == 0:
             return 0.0
 
-        gross_profit = sell_transactions[sell_transactions['profit'] > 0]['profit'].sum()
-        gross_loss = abs(sell_transactions[sell_transactions['profit'] < 0]['profit'].sum())
+        gross_profit = np.sum(returns[returns > 0])
+        gross_loss = np.abs(np.sum(returns[returns < 0]))
 
         if gross_loss == 0:
             return float('inf') if gross_profit > 0 else 0.0
 
         return gross_profit / gross_loss
-
-    def calculate_total_dividends(self):
-        if not self.dividends:
-            return 0.0
-
-        all_dividends = pd.concat(self.dividends, ignore_index=True)
-        return all_dividends['amount'].sum()
 
     def calculate_monthly_returns(self):
         if len(self.portfolio_values) < 2:
@@ -227,11 +375,31 @@ class BacktestMetrics:
 
         return monthly_returns
 
+    def calculate_annual_returns(self):
+        if len(self.portfolio_values) < 2:
+            return pd.DataFrame()
+
+        df = pd.DataFrame({
+            'date': self.dates,
+            'portfolio_value': self.portfolio_values
+        })
+        df['date'] = pd.to_datetime(df['date'])
+        df['year'] = df['date'].dt.year
+        
+        first_value = df.groupby('year')['portfolio_value'].first()
+        last_value = df.groupby('year')['portfolio_value'].last()
+        annual_returns = (last_value - first_value) / first_value
+        
+        return annual_returns.reset_index(name='return')
+
     def get_summary(self):
         returns = self.calculate_returns()
         volatility = self.calculate_volatility()
         sharpe = self.calculate_sharpe_ratio()
+        sortino = self.calculate_sortino_ratio()
         max_dd, peak_date, trough_date = self.calculate_max_drawdown()
+        calmar = self.calculate_calmar_ratio()
+        irr = self.calculate_irr()
         win_rate = self.calculate_win_rate()
         profit_factor = self.calculate_profit_factor()
         total_dividends = self.calculate_total_dividends()
@@ -243,14 +411,24 @@ class BacktestMetrics:
             'final_value': returns['final_value'],
             'volatility': volatility,
             'sharpe_ratio': sharpe,
+            'sortino_ratio': sortino,
             'max_drawdown': max_dd,
             'max_drawdown_peak': peak_date,
             'max_drawdown_trough': trough_date,
+            'calmar_ratio': calmar,
+            'irr': irr,
             'win_rate': win_rate,
             'profit_factor': profit_factor,
             'total_dividends': total_dividends,
             'total_trades': len(pd.concat(self.transactions, ignore_index=True)) if self.transactions else 0
         }
+
+    def calculate_total_dividends(self):
+        if not self.dividends:
+            return 0.0
+
+        all_dividends = pd.concat(self.dividends, ignore_index=True)
+        return all_dividends['amount'].sum() if 'amount' in all_dividends.columns else 0.0
 
     def print_summary(self):
         summary = self.get_summary()
@@ -262,6 +440,7 @@ class BacktestMetrics:
         print(f"\n收益率指标:")
         print(f"  总收益率: {summary['total_return']*100:.2f}%")
         print(f"  年化收益率: {summary['annualized_return']*100:.2f}%")
+        print(f"  IRR: {summary['irr']*100:.2f}%")
 
         print(f"\n风险指标:")
         print(f"  年化波动率: {summary['volatility']*100:.2f}%")
@@ -269,6 +448,8 @@ class BacktestMetrics:
 
         print(f"\n风险调整收益:")
         print(f"  夏普比率: {summary['sharpe_ratio']:.2f}")
+        print(f"  Sortino比率: {summary['sortino_ratio']:.2f}")
+        print(f"  Calmar比率: {summary['calmar_ratio']:.2f}")
 
         print(f"\n交易统计:")
         print(f"  总交易次数: {summary['total_trades']}")

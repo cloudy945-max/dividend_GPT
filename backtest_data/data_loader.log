@@ -1,0 +1,59 @@
+2026-05-10 21:54:24,609 - backtest.simulator - INFO - 开始回测: 2024-01-01 至 2024-06-30, 月度预算: 3000
+2026-05-10 21:54:27,230 - backtest.data_loader - WARNING - 获取PB数据失败 招商银行: module 'akshare' has no attribute 'stock_a_lg_indicator'
+2026-05-10 21:54:27,317 - backtest.data_loader - WARNING - 获取PB数据失败 兴业银行: module 'akshare' has no attribute 'stock_a_lg_indicator'
+2026-05-10 21:54:27,631 - backtest.data_loader - WARNING - 获取PB数据失败 工商银行: module 'akshare' has no attribute 'stock_a_lg_indicator'
+2026-05-10 21:54:28,715 - backtest.data_loader - WARNING - 获取PB数据失败 双汇发展: module 'akshare' has no attribute 'stock_a_lg_indicator'
+2026-05-10 21:54:28,793 - backtest.simulator - INFO - 共有 6 个调仓日期
+2026-05-10 21:54:28,793 - backtest.simulator - INFO - 
+==== 第 1/6 个月: 2024-01-01 ====
+2026-05-10 21:54:28,795 - backtest.simulator - WARNING - 无法构建 2024-01-01 00:00:00 的快照
+2026-05-10 21:54:28,795 - backtest.simulator - INFO - 
+==== 第 2/6 个月: 2024-02-01 ====
+2026-05-10 21:54:28,796 - backtest.simulator - WARNING - 无法构建 2024-02-01 00:00:00 的快照
+2026-05-10 21:54:28,798 - backtest.simulator - INFO - 
+==== 第 3/6 个月: 2024-03-01 ====
+2026-05-10 21:54:28,799 - backtest.simulator - WARNING - 无法构建 2024-03-01 00:00:00 的快照
+2026-05-10 21:54:28,800 - backtest.simulator - INFO - 
+==== 第 4/6 个月: 2024-04-01 ====
+2026-05-10 21:54:28,801 - backtest.simulator - WARNING - 无法构建 2024-04-01 00:00:00 的快照
+2026-05-10 21:54:28,802 - backtest.simulator - INFO - 
+==== 第 5/6 个月: 2024-05-01 ====
+2026-05-10 21:54:28,806 - backtest.runner - INFO - ============================================================
+2026-05-10 21:54:28,806 - backtest.runner - INFO - 开始完整回测
+2026-05-10 21:54:28,806 - backtest.runner - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 21:54:28,806 - backtest.runner - INFO - 回测期间: 2023-01-01 至 2024-12-31
+2026-05-10 21:54:28,807 - backtest.runner - INFO - 月度预算: 3000
+2026-05-10 21:54:28,807 - backtest.runner - INFO - 输出目录: backtest_output
+2026-05-10 21:54:28,807 - backtest.runner - INFO - ============================================================
+2026-05-10 21:54:28,809 - backtest.simulator - INFO - 开始回测: 2023-01-01 至 2024-12-31, 月度预算: 3000
+2026-05-10 21:54:29,128 - backtest.data_loader - WARNING - 尝试 1/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:31,433 - backtest.data_loader - WARNING - 尝试 2/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:34,523 - backtest.data_loader - WARNING - 尝试 3/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:34,524 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:34,524 - backtest.data_loader - ERROR - 加载 招商银行 价格数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:34,583 - backtest.data_loader - WARNING - 尝试 1/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:36,891 - backtest.data_loader - WARNING - 尝试 2/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:38,953 - backtest.data_loader - WARNING - 尝试 3/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:38,954 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:38,954 - backtest.data_loader - ERROR - 加载 兴业银行 价格数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:39,011 - backtest.data_loader - WARNING - 尝试 1/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:41,309 - backtest.data_loader - WARNING - 尝试 2/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:43,598 - backtest.data_loader - WARNING - 尝试 3/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:43,599 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:43,599 - backtest.data_loader - ERROR - 加载 工商银行 价格数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:43,672 - backtest.data_loader - WARNING - 尝试 1/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:45,752 - backtest.data_loader - WARNING - 尝试 2/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:47,829 - backtest.data_loader - WARNING - 尝试 3/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:47,829 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:47,830 - backtest.data_loader - ERROR - 加载 双汇发展 价格数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:47,893 - backtest.data_loader - WARNING - 尝试 1/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:49,950 - backtest.data_loader - WARNING - 尝试 2/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:52,014 - backtest.data_loader - WARNING - 尝试 3/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:52,015 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:52,015 - backtest.data_loader - ERROR - 加载 159307 价格数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 21:54:52,015 - backtest.data_loader - WARNING - 获取PB数据失败 招商银行: module 'akshare' has no attribute 'stock_a_lg_indicator'
+2026-05-10 21:54:52,099 - backtest.data_loader - WARNING - 获取PB数据失败 兴业银行: module 'akshare' has no attribute 'stock_a_lg_indicator'
+2026-05-10 21:54:52,156 - backtest.data_loader - WARNING - 获取PB数据失败 工商银行: module 'akshare' has no attribute 'stock_a_lg_indicator'
+2026-05-10 21:54:52,214 - backtest.data_loader - WARNING - 获取PB数据失败 双汇发展: module 'akshare' has no attribute 'stock_a_lg_indicator'
+2026-05-10 21:54:52,270 - backtest.simulator - ERROR - 未能加载价格数据
+2026-05-10 21:54:52,270 - backtest.runner - ERROR - 回测失败：未生成历史数据
