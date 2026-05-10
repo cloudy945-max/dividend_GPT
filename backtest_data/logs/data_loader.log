@@ -1,0 +1,400 @@
+2026-05-10 22:15:53,893 - backtest.strategy_adapter - INFO - 策略适配器初始化完成
+2026-05-10 22:15:53,893 - backtest.simulator - INFO - 回测引擎初始化完成
+2026-05-10 22:15:53,893 - backtest.strategy_adapter - INFO - 策略适配器状态已重置
+2026-05-10 22:15:53,894 - backtest.simulator - INFO - 回测引擎已重置
+2026-05-10 22:15:53,894 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:15:53,894 - backtest.simulator - INFO - 开始回测: 2024-01-01 至 2024-06-30
+2026-05-10 22:15:53,894 - backtest.simulator - INFO - 月度预算: 3000.00
+2026-05-10 22:15:53,894 - backtest.simulator - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:15:53,894 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:15:54,219 - backtest.simulator - INFO - 共有 6 个调仓日期
+2026-05-10 22:15:54,219 - backtest.simulator - INFO - 
+==== 第 1/6 个月: 2024-01-31 ====
+2026-05-10 22:15:54,219 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 3000.00
+2026-05-10 22:15:54,221 - backtest.simulator - WARNING - 无法构建 2024-01-31 00:00:00 的快照
+2026-05-10 22:15:54,222 - backtest.simulator - INFO - 
+==== 第 2/6 个月: 2024-02-29 ====
+2026-05-10 22:15:54,222 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 6000.00
+2026-05-10 22:15:54,225 - backtest.simulator - WARNING - 无法构建 2024-02-29 00:00:00 的快照
+2026-05-10 22:15:54,225 - backtest.simulator - INFO - 
+==== 第 3/6 个月: 2024-03-29 ====
+2026-05-10 22:15:54,225 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 9000.00
+2026-05-10 22:15:54,227 - backtest.simulator - WARNING - 无法构建 2024-03-29 00:00:00 的快照
+2026-05-10 22:15:54,227 - backtest.simulator - INFO - 
+==== 第 4/6 个月: 2024-04-30 ====
+2026-05-10 22:15:54,229 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 12000.00
+2026-05-10 22:15:54,232 - backtest.runner - INFO - ============================================================
+2026-05-10 22:15:54,232 - backtest.runner - INFO - 开始完整回测
+2026-05-10 22:15:54,233 - backtest.runner - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:15:54,233 - backtest.runner - INFO - 回测期间: 2023-01-01 至 2024-12-31
+2026-05-10 22:15:54,233 - backtest.runner - INFO - 月度预算: 3000.0
+2026-05-10 22:15:54,233 - backtest.runner - INFO - 输出目录: backtest_output
+2026-05-10 22:15:54,233 - backtest.runner - INFO - 仅使用缓存: False
+2026-05-10 22:15:54,233 - backtest.runner - INFO - ============================================================
+2026-05-10 22:15:54,236 - backtest.strategy_adapter - INFO - 策略适配器初始化完成
+2026-05-10 22:15:54,236 - backtest.simulator - INFO - 回测引擎初始化完成
+2026-05-10 22:15:54,236 - backtest.strategy_adapter - INFO - 策略适配器状态已重置
+2026-05-10 22:15:54,236 - backtest.simulator - INFO - 回测引擎已重置
+2026-05-10 22:15:54,236 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:15:54,236 - backtest.simulator - INFO - 开始回测: 2023-01-01 至 2024-12-31
+2026-05-10 22:15:54,237 - backtest.simulator - INFO - 月度预算: 3000.00
+2026-05-10 22:15:54,237 - backtest.simulator - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:15:54,237 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:15:54,293 - backtest.data_loader - WARNING - 尝试 1/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:15:56,363 - backtest.data_loader - WARNING - 尝试 2/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:15:58,420 - backtest.data_loader - WARNING - 尝试 3/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:15:58,421 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:15:58,421 - backtest.data_loader - ERROR - 加载 招商银行 价格数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:15:58,496 - backtest.data_loader - WARNING - 尝试 1/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:00,580 - backtest.data_loader - WARNING - 尝试 2/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:02,663 - backtest.data_loader - WARNING - 尝试 3/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:02,663 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:02,664 - backtest.data_loader - ERROR - 加载 兴业银行 价格数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:02,713 - backtest.data_loader - WARNING - 尝试 1/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:04,782 - backtest.data_loader - WARNING - 尝试 2/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:06,847 - backtest.data_loader - WARNING - 尝试 3/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:06,847 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:06,847 - backtest.data_loader - ERROR - 加载 工商银行 价格数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:06,899 - backtest.data_loader - WARNING - 尝试 1/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:08,958 - backtest.data_loader - WARNING - 尝试 2/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:11,021 - backtest.data_loader - WARNING - 尝试 3/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:11,021 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:11,023 - backtest.data_loader - ERROR - 加载 双汇发展 价格数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:11,080 - backtest.data_loader - WARNING - 尝试 1/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:13,161 - backtest.data_loader - WARNING - 尝试 2/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:15,307 - backtest.data_loader - WARNING - 尝试 3/3 失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:15,308 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:15,308 - backtest.data_loader - ERROR - 加载 159307 价格数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-05-10 22:16:16,080 - backtest.simulator - ERROR - 未能加载价格数据
+2026-05-10 22:16:16,080 - backtest.runner - ERROR - 回测失败：未生成历史数据
+2026-05-10 22:16:32,433 - backtest.runner - INFO - ============================================================
+2026-05-10 22:16:32,433 - backtest.runner - INFO - 开始完整回测
+2026-05-10 22:16:32,433 - backtest.runner - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:16:32,433 - backtest.runner - INFO - 回测期间: 2024-01-01 至 2024-06-30
+2026-05-10 22:16:32,434 - backtest.runner - INFO - 月度预算: 3000
+2026-05-10 22:16:32,434 - backtest.runner - INFO - 输出目录: backtest_output
+2026-05-10 22:16:32,434 - backtest.runner - INFO - 仅使用缓存: True
+2026-05-10 22:16:32,434 - backtest.runner - INFO - ============================================================
+2026-05-10 22:16:32,434 - backtest.strategy_adapter - INFO - 策略适配器初始化完成
+2026-05-10 22:16:32,436 - backtest.simulator - INFO - 回测引擎初始化完成
+2026-05-10 22:16:32,436 - backtest.strategy_adapter - INFO - 策略适配器状态已重置
+2026-05-10 22:16:32,436 - backtest.simulator - INFO - 回测引擎已重置
+2026-05-10 22:16:32,436 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:16:32,437 - backtest.simulator - INFO - 开始回测: 2024-01-01 至 2024-06-30
+2026-05-10 22:16:32,437 - backtest.simulator - INFO - 月度预算: 3000.00
+2026-05-10 22:16:32,437 - backtest.simulator - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:16:32,437 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:16:32,470 - backtest.simulator - INFO - 共有 6 个调仓日期
+2026-05-10 22:16:32,471 - backtest.simulator - INFO - 
+==== 第 1/6 个月: 2024-01-31 ====
+2026-05-10 22:16:32,471 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 3000.00
+2026-05-10 22:16:32,473 - backtest.simulator - WARNING - 无法构建 2024-01-31 00:00:00 的快照
+2026-05-10 22:16:32,473 - backtest.simulator - INFO - 
+==== 第 2/6 个月: 2024-02-29 ====
+2026-05-10 22:16:32,474 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 6000.00
+2026-05-10 22:16:32,476 - backtest.simulator - WARNING - 无法构建 2024-02-29 00:00:00 的快照
+2026-05-10 22:16:32,477 - backtest.simulator - INFO - 
+==== 第 3/6 个月: 2024-03-29 ====
+2026-05-10 22:16:32,477 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 9000.00
+2026-05-10 22:16:32,480 - backtest.simulator - WARNING - 无法构建 2024-03-29 00:00:00 的快照
+2026-05-10 22:16:32,481 - backtest.simulator - INFO - 
+==== 第 4/6 个月: 2024-04-30 ====
+2026-05-10 22:16:32,481 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 12000.00
+2026-05-10 22:19:10,766 - backtest.runner - INFO - ============================================================
+2026-05-10 22:19:10,767 - backtest.runner - INFO - 开始完整回测
+2026-05-10 22:19:10,767 - backtest.runner - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:19:10,767 - backtest.runner - INFO - 回测期间: 2024-01-01 至 2024-06-30
+2026-05-10 22:19:10,767 - backtest.runner - INFO - 月度预算: 3000
+2026-05-10 22:19:10,767 - backtest.runner - INFO - 输出目录: backtest_output
+2026-05-10 22:19:10,768 - backtest.runner - INFO - 仅使用缓存: True
+2026-05-10 22:19:10,768 - backtest.runner - INFO - ============================================================
+2026-05-10 22:19:10,769 - backtest.strategy_adapter - INFO - 策略适配器初始化完成
+2026-05-10 22:19:10,769 - backtest.simulator - INFO - 回测引擎初始化完成
+2026-05-10 22:19:10,769 - backtest.strategy_adapter - INFO - 策略适配器状态已重置
+2026-05-10 22:19:10,769 - backtest.simulator - INFO - 回测引擎已重置
+2026-05-10 22:19:10,770 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:19:10,770 - backtest.simulator - INFO - 开始回测: 2024-01-01 至 2024-06-30
+2026-05-10 22:19:10,770 - backtest.simulator - INFO - 月度预算: 3000.00
+2026-05-10 22:19:10,770 - backtest.simulator - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:19:10,770 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:19:10,834 - backtest.simulator - INFO - 共有 6 个调仓日期
+2026-05-10 22:19:10,835 - backtest.simulator - INFO - 
+==== 第 1/6 个月: 2024-01-31 ====
+2026-05-10 22:19:10,835 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 3000.00
+2026-05-10 22:19:10,837 - backtest.simulator - WARNING - 无法构建 2024-01-31 00:00:00 的快照
+2026-05-10 22:19:10,837 - backtest.simulator - INFO - 
+==== 第 2/6 个月: 2024-02-29 ====
+2026-05-10 22:19:10,837 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 6000.00
+2026-05-10 22:19:10,841 - backtest.simulator - WARNING - 无法构建 2024-02-29 00:00:00 的快照
+2026-05-10 22:19:10,842 - backtest.simulator - INFO - 
+==== 第 3/6 个月: 2024-03-29 ====
+2026-05-10 22:19:10,842 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 9000.00
+2026-05-10 22:19:10,845 - backtest.simulator - WARNING - 无法构建 2024-03-29 00:00:00 的快照
+2026-05-10 22:19:10,845 - backtest.simulator - INFO - 
+==== 第 4/6 个月: 2024-04-30 ====
+2026-05-10 22:19:10,846 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 12000.00
+2026-05-10 22:19:10,856 - backtest.simulator - INFO - 当前持仓市值: 0.00
+2026-05-10 22:19:10,856 - backtest.simulator - INFO - 当前资金池: 0.00
+2026-05-10 22:19:10,856 - backtest.strategy_adapter - INFO - 月度再平衡: 持仓价值=0.00, 可用现金=0.00, 月度预算=3000.00, 资金池上限=12000.00
+2026-05-10 22:19:10,856 - backtest.strategy_adapter - INFO - 强买检查: None (PB=None)
+2026-05-10 22:19:10,857 - backtest.strategy_adapter - INFO - 本月有股票交易，重置连续无成交月份计数器
+2026-05-10 22:19:10,857 - backtest.strategy_adapter - INFO - 月度买入计划生成完成: 1个动作, 剩余资金池=0.00
+2026-05-10 22:19:10,857 - backtest.simulator - INFO - 本月强买: 否
+2026-05-10 22:19:10,857 - backtest.simulator - INFO - 本月操作: 1 笔
+2026-05-10 22:19:10,857 - backtest.simulator - INFO -   - 买入 招商银行 100股 @ 29.33 = 2933.00 (rebalance)
+2026-05-10 22:19:10,858 - backtest.simulator - INFO - 月末总资产: 11995.00
+2026-05-10 22:19:10,858 - backtest.simulator - INFO -   - 现金: 9062.00
+2026-05-10 22:19:10,858 - backtest.simulator - INFO -   - 资金池: 0.00
+2026-05-10 22:19:10,858 - backtest.simulator - INFO -   - 持仓: 2933.00
+2026-05-10 22:19:10,859 - backtest.simulator - INFO - 
+==== 第 5/6 个月: 2024-05-31 ====
+2026-05-10 22:19:10,859 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 12062.00
+2026-05-10 22:19:10,904 - backtest.simulator - INFO - 当前持仓市值: 2930.00
+2026-05-10 22:19:10,905 - backtest.simulator - INFO - 当前资金池: 0.00
+2026-05-10 22:19:10,905 - backtest.strategy_adapter - INFO - 月度再平衡: 持仓价值=2930.00, 可用现金=0.00, 月度预算=3000.00, 资金池上限=12000.00
+2026-05-10 22:19:10,905 - backtest.strategy_adapter - INFO - 强买检查: None (PB=None)
+2026-05-10 22:19:10,905 - backtest.strategy_adapter - INFO - 强买触发(价格百分位): 双汇发展, 百分位=0.020 <= 阈值0.2
+2026-05-10 22:19:10,906 - backtest.strategy_adapter - INFO - 本月有股票交易，重置连续无成交月份计数器
+2026-05-10 22:19:10,906 - backtest.strategy_adapter - INFO - 月度买入计划生成完成: 2个动作, 剩余资金池=0.00
+2026-05-10 22:19:10,906 - backtest.simulator - INFO - 本月强买: 否
+2026-05-10 22:19:10,907 - backtest.simulator - INFO - 本月操作: 2 笔
+2026-05-10 22:19:10,907 - backtest.simulator - INFO -   - 买入 兴业银行 100股 @ 15.23 = 1523.00 (rebalance)
+2026-05-10 22:19:10,907 - backtest.simulator - INFO -   - 买入 工商银行 300股 @ 4.67 = 1401.00 (rebalance)
+2026-05-10 22:19:10,907 - backtest.simulator - INFO - 月末总资产: 14982.00
+2026-05-10 22:19:10,907 - backtest.simulator - INFO -   - 现金: 9128.00
+2026-05-10 22:19:10,907 - backtest.simulator - INFO -   - 资金池: 0.00
+2026-05-10 22:19:10,907 - backtest.simulator - INFO -   - 持仓: 5854.00
+2026-05-10 22:19:10,909 - backtest.simulator - INFO - 
+==== 第 6/6 个月: 2024-06-28 ====
+2026-05-10 22:19:10,909 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 12128.00
+2026-05-10 22:19:10,917 - backtest.simulator - INFO - 当前持仓市值: 5899.00
+2026-05-10 22:19:10,917 - backtest.simulator - INFO - 当前资金池: 0.00
+2026-05-10 22:19:10,917 - backtest.strategy_adapter - INFO - 月度再平衡: 持仓价值=5899.00, 可用现金=0.00, 月度预算=3000.00, 资金池上限=12000.00
+2026-05-10 22:19:10,917 - backtest.strategy_adapter - INFO - 强买检查: None (PB=None)
+2026-05-10 22:19:10,917 - backtest.strategy_adapter - INFO - 强买触发(价格百分位): 双汇发展, 百分位=0.000 <= 阈值0.2
+2026-05-10 22:19:10,919 - backtest.strategy_adapter - INFO - 本月有股票交易，重置连续无成交月份计数器
+2026-05-10 22:19:10,919 - backtest.strategy_adapter - INFO - 月度买入计划生成完成: 2个动作, 剩余资金池=0.00
+2026-05-10 22:19:10,920 - backtest.simulator - INFO - 本月强买: 否
+2026-05-10 22:19:10,920 - backtest.simulator - INFO - 本月操作: 2 笔
+2026-05-10 22:19:10,920 - backtest.simulator - INFO -   - 买入 双汇发展 100股 @ 20.91 = 2091.00 (rebalance)
+2026-05-10 22:19:10,920 - backtest.simulator - INFO -   - 买入 工商银行 100股 @ 4.94 = 494.00 (rebalance)
+2026-05-10 22:19:10,921 - backtest.simulator - INFO - 月末总资产: 18017.00
+2026-05-10 22:19:10,921 - backtest.simulator - INFO -   - 现金: 9533.00
+2026-05-10 22:19:10,921 - backtest.simulator - INFO -   - 资金池: 0.00
+2026-05-10 22:19:10,922 - backtest.simulator - INFO -   - 持仓: 8484.00
+2026-05-10 22:19:10,922 - backtest.simulator - INFO - 
+============================================================
+2026-05-10 22:19:10,922 - backtest.simulator - INFO - 回测完成
+2026-05-10 22:19:10,922 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:19:10,962 - backtest.runner - WARNING - 无法加载 sh000300 数据
+2026-05-10 22:19:10,963 - backtest.runner - WARNING - 无法加载 sz159307 数据
+2026-05-10 22:19:44,519 - backtest.runner - INFO - ============================================================
+2026-05-10 22:19:44,519 - backtest.runner - INFO - 开始完整回测
+2026-05-10 22:19:44,519 - backtest.runner - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:19:44,520 - backtest.runner - INFO - 回测期间: 2024-01-01 至 2024-06-30
+2026-05-10 22:19:44,520 - backtest.runner - INFO - 月度预算: 3000
+2026-05-10 22:19:44,520 - backtest.runner - INFO - 输出目录: backtest_output
+2026-05-10 22:19:44,520 - backtest.runner - INFO - 仅使用缓存: True
+2026-05-10 22:19:44,520 - backtest.runner - INFO - ============================================================
+2026-05-10 22:19:44,521 - backtest.strategy_adapter - INFO - 策略适配器初始化完成
+2026-05-10 22:19:44,521 - backtest.simulator - INFO - 回测引擎初始化完成
+2026-05-10 22:19:44,521 - backtest.strategy_adapter - INFO - 策略适配器状态已重置
+2026-05-10 22:19:44,522 - backtest.simulator - INFO - 回测引擎已重置
+2026-05-10 22:19:44,522 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:19:44,522 - backtest.simulator - INFO - 开始回测: 2024-01-01 至 2024-06-30
+2026-05-10 22:19:44,522 - backtest.simulator - INFO - 月度预算: 3000.00
+2026-05-10 22:19:44,522 - backtest.simulator - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:19:44,523 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:19:44,586 - backtest.simulator - INFO - 共有 6 个调仓日期
+2026-05-10 22:19:44,586 - backtest.simulator - INFO - 
+==== 第 1/6 个月: 2024-01-31 ====
+2026-05-10 22:19:44,586 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 3000.00
+2026-05-10 22:19:44,589 - backtest.simulator - WARNING - 无法构建 2024-01-31 00:00:00 的快照
+2026-05-10 22:19:44,589 - backtest.simulator - INFO - 
+==== 第 2/6 个月: 2024-02-29 ====
+2026-05-10 22:19:44,589 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 6000.00
+2026-05-10 22:19:44,592 - backtest.simulator - WARNING - 无法构建 2024-02-29 00:00:00 的快照
+2026-05-10 22:19:44,593 - backtest.simulator - INFO - 
+==== 第 3/6 个月: 2024-03-29 ====
+2026-05-10 22:19:44,593 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 9000.00
+2026-05-10 22:19:44,594 - backtest.simulator - WARNING - 无法构建 2024-03-29 00:00:00 的快照
+2026-05-10 22:19:44,594 - backtest.simulator - INFO - 
+==== 第 4/6 个月: 2024-04-30 ====
+2026-05-10 22:19:44,595 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 12000.00
+2026-05-10 22:19:44,604 - backtest.simulator - INFO - 当前持仓市值: 0.00
+2026-05-10 22:19:44,604 - backtest.simulator - INFO - 当前资金池: 0.00
+2026-05-10 22:19:44,605 - backtest.strategy_adapter - INFO - 月度再平衡: 持仓价值=0.00, 可用现金=0.00, 月度预算=3000.00, 资金池上限=12000.00
+2026-05-10 22:19:44,605 - backtest.strategy_adapter - INFO - 强买检查: None (PB=None)
+2026-05-10 22:19:44,605 - backtest.strategy_adapter - INFO - 本月有股票交易，重置连续无成交月份计数器
+2026-05-10 22:19:44,605 - backtest.strategy_adapter - INFO - 月度买入计划生成完成: 1个动作, 剩余资金池=0.00
+2026-05-10 22:19:44,605 - backtest.simulator - INFO - 本月强买: 否
+2026-05-10 22:19:44,606 - backtest.simulator - INFO - 本月操作: 1 笔
+2026-05-10 22:19:44,606 - backtest.simulator - INFO -   - 买入 招商银行 100股 @ 29.33 = 2933.00 (rebalance)
+2026-05-10 22:19:44,606 - backtest.simulator - INFO - 月末总资产: 11995.00
+2026-05-10 22:19:44,606 - backtest.simulator - INFO -   - 现金: 9062.00
+2026-05-10 22:19:44,607 - backtest.simulator - INFO -   - 资金池: 0.00
+2026-05-10 22:19:44,607 - backtest.simulator - INFO -   - 持仓: 2933.00
+2026-05-10 22:19:44,607 - backtest.simulator - INFO - 
+==== 第 5/6 个月: 2024-05-31 ====
+2026-05-10 22:19:44,607 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 12062.00
+2026-05-10 22:19:44,643 - backtest.simulator - INFO - 当前持仓市值: 2930.00
+2026-05-10 22:19:44,643 - backtest.simulator - INFO - 当前资金池: 0.00
+2026-05-10 22:19:44,643 - backtest.strategy_adapter - INFO - 月度再平衡: 持仓价值=2930.00, 可用现金=0.00, 月度预算=3000.00, 资金池上限=12000.00
+2026-05-10 22:19:44,643 - backtest.strategy_adapter - INFO - 强买检查: None (PB=None)
+2026-05-10 22:19:44,644 - backtest.strategy_adapter - INFO - 强买触发(价格百分位): 双汇发展, 百分位=0.020 <= 阈值0.2
+2026-05-10 22:19:44,644 - backtest.strategy_adapter - INFO - 本月有股票交易，重置连续无成交月份计数器
+2026-05-10 22:19:44,644 - backtest.strategy_adapter - INFO - 月度买入计划生成完成: 2个动作, 剩余资金池=0.00
+2026-05-10 22:19:44,645 - backtest.simulator - INFO - 本月强买: 否
+2026-05-10 22:19:44,645 - backtest.simulator - INFO - 本月操作: 2 笔
+2026-05-10 22:19:44,645 - backtest.simulator - INFO -   - 买入 兴业银行 100股 @ 15.23 = 1523.00 (rebalance)
+2026-05-10 22:19:44,645 - backtest.simulator - INFO -   - 买入 工商银行 300股 @ 4.67 = 1401.00 (rebalance)
+2026-05-10 22:19:44,645 - backtest.simulator - INFO - 月末总资产: 14982.00
+2026-05-10 22:19:44,646 - backtest.simulator - INFO -   - 现金: 9128.00
+2026-05-10 22:19:44,646 - backtest.simulator - INFO -   - 资金池: 0.00
+2026-05-10 22:19:44,646 - backtest.simulator - INFO -   - 持仓: 5854.00
+2026-05-10 22:19:44,646 - backtest.simulator - INFO - 
+==== 第 6/6 个月: 2024-06-28 ====
+2026-05-10 22:19:44,648 - backtest.simulator - INFO - 新增月度预算: 3000.00, 当前现金: 12128.00
+2026-05-10 22:19:44,658 - backtest.simulator - INFO - 当前持仓市值: 5899.00
+2026-05-10 22:19:44,659 - backtest.simulator - INFO - 当前资金池: 0.00
+2026-05-10 22:19:44,659 - backtest.strategy_adapter - INFO - 月度再平衡: 持仓价值=5899.00, 可用现金=0.00, 月度预算=3000.00, 资金池上限=12000.00
+2026-05-10 22:19:44,659 - backtest.strategy_adapter - INFO - 强买检查: None (PB=None)
+2026-05-10 22:19:44,659 - backtest.strategy_adapter - INFO - 强买触发(价格百分位): 双汇发展, 百分位=0.000 <= 阈值0.2
+2026-05-10 22:19:44,660 - backtest.strategy_adapter - INFO - 本月有股票交易，重置连续无成交月份计数器
+2026-05-10 22:19:44,660 - backtest.strategy_adapter - INFO - 月度买入计划生成完成: 2个动作, 剩余资金池=0.00
+2026-05-10 22:19:44,660 - backtest.simulator - INFO - 本月强买: 否
+2026-05-10 22:19:44,660 - backtest.simulator - INFO - 本月操作: 2 笔
+2026-05-10 22:19:44,660 - backtest.simulator - INFO -   - 买入 双汇发展 100股 @ 20.91 = 2091.00 (rebalance)
+2026-05-10 22:19:44,661 - backtest.simulator - INFO -   - 买入 工商银行 100股 @ 4.94 = 494.00 (rebalance)
+2026-05-10 22:19:44,661 - backtest.simulator - INFO - 月末总资产: 18017.00
+2026-05-10 22:19:44,661 - backtest.simulator - INFO -   - 现金: 9533.00
+2026-05-10 22:19:44,661 - backtest.simulator - INFO -   - 资金池: 0.00
+2026-05-10 22:19:44,661 - backtest.simulator - INFO -   - 持仓: 8484.00
+2026-05-10 22:19:44,662 - backtest.simulator - INFO - 
+============================================================
+2026-05-10 22:19:44,662 - backtest.simulator - INFO - 回测完成
+2026-05-10 22:19:44,662 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:19:44,705 - backtest.runner - WARNING - 无法加载 sh000300 数据
+2026-05-10 22:19:44,707 - backtest.runner - WARNING - 无法加载 sz159307 数据
+2026-05-10 22:19:46,345 - backtest.runner - INFO - 权益曲线图表已保存: backtest_output\equity_curve.png
+2026-05-10 22:19:46,703 - backtest.runner - INFO - 回撤曲线图表已保存: backtest_output\drawdown_curve.png
+2026-05-10 22:19:47,143 - backtest.runner - INFO - 资产配置图表已保存: backtest_output\asset_allocation.png
+2026-05-10 22:19:47,157 - backtest.runner - INFO - 
+回测完成！报告已保存至: backtest_output\backtest_report.md
+2026-05-10 22:37:22,404 - backtest.strategy_adapter - INFO - 策略适配器初始化完成
+2026-05-10 22:37:22,404 - backtest.simulator - INFO - 回测引擎初始化完成
+2026-05-10 22:37:22,405 - backtest.strategy_adapter - INFO - 策略适配器状态已重置
+2026-05-10 22:37:22,405 - backtest.simulator - INFO - 回测引擎已重置
+2026-05-10 22:37:22,405 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:37:22,405 - backtest.simulator - INFO - 开始回测: 2024-01-01 至 2024-06-30
+2026-05-10 22:37:22,405 - backtest.simulator - INFO - 月度预算: 3000.00
+2026-05-10 22:37:22,405 - backtest.simulator - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:37:22,405 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:37:22,451 - backtest.data_loader - WARNING - 尝试 1/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:24,475 - backtest.data_loader - WARNING - 尝试 2/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:26,503 - backtest.data_loader - WARNING - 尝试 3/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:26,504 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:26,504 - backtest.data_loader - ERROR - 加载 招商银行 价格数据失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:26,526 - backtest.data_loader - WARNING - 尝试 1/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%85%B4%E4%B8%9A%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:28,546 - backtest.data_loader - WARNING - 尝试 2/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%85%B4%E4%B8%9A%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:30,562 - backtest.data_loader - WARNING - 尝试 3/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%85%B4%E4%B8%9A%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:30,563 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%85%B4%E4%B8%9A%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:30,563 - backtest.data_loader - ERROR - 加载 兴业银行 价格数据失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%85%B4%E4%B8%9A%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:30,580 - backtest.data_loader - WARNING - 尝试 1/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:32,598 - backtest.data_loader - WARNING - 尝试 2/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:34,651 - backtest.data_loader - WARNING - 尝试 3/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:34,652 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:34,652 - backtest.data_loader - ERROR - 加载 工商银行 价格数据失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:34,666 - backtest.data_loader - WARNING - 尝试 1/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%8F%8C%E6%B1%87%E5%8F%91%E5%B1%95&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:36,694 - backtest.data_loader - WARNING - 尝试 2/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%8F%8C%E6%B1%87%E5%8F%91%E5%B1%95&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:38,718 - backtest.data_loader - WARNING - 尝试 3/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%8F%8C%E6%B1%87%E5%8F%91%E5%B1%95&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:38,719 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%8F%8C%E6%B1%87%E5%8F%91%E5%B1%95&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:38,719 - backtest.data_loader - ERROR - 加载 双汇发展 价格数据失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%8F%8C%E6%B1%87%E5%8F%91%E5%B1%95&beg=20240101&end=20240630 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:38,736 - backtest.data_loader - WARNING - 尝试 1/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=0&beg=19700101&end=20500101&secid=0.159307 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:40,765 - backtest.data_loader - WARNING - 尝试 2/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=0&beg=19700101&end=20500101&secid=0.159307 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:42,784 - backtest.data_loader - WARNING - 尝试 3/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=0&beg=19700101&end=20500101&secid=0.159307 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:42,784 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=0&beg=19700101&end=20500101&secid=0.159307 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:42,784 - backtest.data_loader - ERROR - 加载 159307 价格数据失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=0&beg=19700101&end=20500101&secid=0.159307 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:42,976 - backtest.simulator - ERROR - 未能加载价格数据
+2026-05-10 22:37:42,977 - backtest.runner - INFO - ============================================================
+2026-05-10 22:37:42,977 - backtest.runner - INFO - 开始完整回测
+2026-05-10 22:37:42,978 - backtest.runner - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:37:42,978 - backtest.runner - INFO - 回测期间: 2024-01-01 至 2024-06-30
+2026-05-10 22:37:42,978 - backtest.runner - INFO - 月度预算: 3000.0
+2026-05-10 22:37:42,978 - backtest.runner - INFO - 输出目录: backtest_output
+2026-05-10 22:37:42,978 - backtest.runner - INFO - 仅使用缓存: True
+2026-05-10 22:37:42,978 - backtest.runner - INFO - ============================================================
+2026-05-10 22:37:42,979 - backtest.strategy_adapter - INFO - 策略适配器初始化完成
+2026-05-10 22:37:42,979 - backtest.simulator - INFO - 回测引擎初始化完成
+2026-05-10 22:37:42,979 - backtest.strategy_adapter - INFO - 策略适配器状态已重置
+2026-05-10 22:37:42,980 - backtest.simulator - INFO - 回测引擎已重置
+2026-05-10 22:37:42,980 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:37:42,980 - backtest.simulator - INFO - 开始回测: 2024-01-01 至 2024-06-30
+2026-05-10 22:37:42,980 - backtest.simulator - INFO - 月度预算: 3000.00
+2026-05-10 22:37:42,981 - backtest.simulator - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:37:42,981 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:37:42,983 - backtest.simulator - ERROR - 未能加载价格数据
+2026-05-10 22:37:42,983 - backtest.runner - ERROR - 回测失败：未生成历史数据
+2026-05-10 22:37:42,985 - backtest.runner - INFO - ============================================================
+2026-05-10 22:37:42,985 - backtest.runner - INFO - 开始完整回测
+2026-05-10 22:37:42,985 - backtest.runner - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:37:42,985 - backtest.runner - INFO - 回测期间: 2023-01-01 至 2024-12-31
+2026-05-10 22:37:42,985 - backtest.runner - INFO - 月度预算: 3000.0
+2026-05-10 22:37:42,986 - backtest.runner - INFO - 输出目录: backtest_output
+2026-05-10 22:37:42,986 - backtest.runner - INFO - 仅使用缓存: False
+2026-05-10 22:37:42,986 - backtest.runner - INFO - ============================================================
+2026-05-10 22:37:42,987 - backtest.strategy_adapter - INFO - 策略适配器初始化完成
+2026-05-10 22:37:42,987 - backtest.simulator - INFO - 回测引擎初始化完成
+2026-05-10 22:37:42,987 - backtest.strategy_adapter - INFO - 策略适配器状态已重置
+2026-05-10 22:37:42,987 - backtest.simulator - INFO - 回测引擎已重置
+2026-05-10 22:37:42,988 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:37:42,988 - backtest.simulator - INFO - 开始回测: 2023-01-01 至 2024-12-31
+2026-05-10 22:37:42,988 - backtest.simulator - INFO - 月度预算: 3000.00
+2026-05-10 22:37:42,989 - backtest.simulator - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:37:42,989 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:37:43,003 - backtest.data_loader - WARNING - 尝试 1/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:45,023 - backtest.data_loader - WARNING - 尝试 2/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:47,052 - backtest.data_loader - WARNING - 尝试 3/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:47,053 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:47,053 - backtest.data_loader - ERROR - 加载 招商银行 价格数据失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E6%8B%9B%E5%95%86%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:47,067 - backtest.data_loader - WARNING - 尝试 1/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%85%B4%E4%B8%9A%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:49,093 - backtest.data_loader - WARNING - 尝试 2/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%85%B4%E4%B8%9A%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:51,109 - backtest.data_loader - WARNING - 尝试 3/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%85%B4%E4%B8%9A%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:51,109 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%85%B4%E4%B8%9A%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:51,111 - backtest.data_loader - ERROR - 加载 兴业银行 价格数据失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%85%B4%E4%B8%9A%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:51,124 - backtest.data_loader - WARNING - 尝试 1/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:53,142 - backtest.data_loader - WARNING - 尝试 2/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:55,162 - backtest.data_loader - WARNING - 尝试 3/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:55,162 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:55,162 - backtest.data_loader - ERROR - 加载 工商银行 价格数据失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:55,180 - backtest.data_loader - WARNING - 尝试 1/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%8F%8C%E6%B1%87%E5%8F%91%E5%B1%95&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:57,207 - backtest.data_loader - WARNING - 尝试 2/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%8F%8C%E6%B1%87%E5%8F%91%E5%B1%95&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:59,221 - backtest.data_loader - WARNING - 尝试 3/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%8F%8C%E6%B1%87%E5%8F%91%E5%B1%95&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:59,221 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%8F%8C%E6%B1%87%E5%8F%91%E5%B1%95&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:59,222 - backtest.data_loader - ERROR - 加载 双汇发展 价格数据失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=1&secid=0.%E5%8F%8C%E6%B1%87%E5%8F%91%E5%B1%95&beg=20230101&end=20241231 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:37:59,249 - backtest.data_loader - WARNING - 尝试 1/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=0&beg=19700101&end=20500101&secid=0.159307 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:38:01,269 - backtest.data_loader - WARNING - 尝试 2/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=0&beg=19700101&end=20500101&secid=0.159307 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:38:03,300 - backtest.data_loader - WARNING - 尝试 3/3 失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=0&beg=19700101&end=20500101&secid=0.159307 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:38:03,300 - backtest.data_loader - ERROR - 所有 3 次尝试均失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=0&beg=19700101&end=20500101&secid=0.159307 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:38:03,300 - backtest.data_loader - ERROR - 加载 159307 价格数据失败: HTTPSConnectionPool(host='push2his.eastmoney.com', port=443): Max retries exceeded with url: /api/qt/stock/kline/get?fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf116&ut=7eea3edcaed734bea9cbfc24409ed989&klt=101&fqt=0&beg=19700101&end=20500101&secid=0.159307 (Caused by ProxyError('Unable to connect to proxy', SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1129)'))))
+2026-05-10 22:38:03,531 - backtest.simulator - ERROR - 未能加载价格数据
+2026-05-10 22:38:03,532 - backtest.runner - ERROR - 回测失败：未生成历史数据
+2026-05-10 22:39:53,311 - backtest.runner - INFO - ============================================================
+2026-05-10 22:39:53,312 - backtest.runner - INFO - 开始完整回测
+2026-05-10 22:39:53,312 - backtest.runner - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:39:53,312 - backtest.runner - INFO - 回测期间: 2024-01-01 至 2024-06-30
+2026-05-10 22:39:53,312 - backtest.runner - INFO - 月度预算: 3000.0
+2026-05-10 22:39:53,313 - backtest.runner - INFO - 输出目录: backtest_output
+2026-05-10 22:39:53,313 - backtest.runner - INFO - 仅使用缓存: True
+2026-05-10 22:39:53,313 - backtest.runner - INFO - ============================================================
+2026-05-10 22:39:53,313 - backtest.strategy_adapter - INFO - 策略适配器初始化完成
+2026-05-10 22:39:53,313 - backtest.simulator - INFO - 回测引擎初始化完成
+2026-05-10 22:39:53,314 - backtest.strategy_adapter - INFO - 策略适配器状态已重置
+2026-05-10 22:39:53,314 - backtest.simulator - INFO - 回测引擎已重置
+2026-05-10 22:39:53,314 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:39:53,315 - backtest.simulator - INFO - 开始回测: 2024-01-01 至 2024-06-30
+2026-05-10 22:39:53,315 - backtest.simulator - INFO - 月度预算: 3000.00
+2026-05-10 22:39:53,315 - backtest.simulator - INFO - 股票列表: ['招商银行', '兴业银行', '工商银行', '双汇发展', '159307']
+2026-05-10 22:39:53,315 - backtest.simulator - INFO - ============================================================
+2026-05-10 22:39:53,316 - backtest.simulator - ERROR - 未能加载价格数据
+2026-05-10 22:39:53,317 - backtest.runner - ERROR - 回测失败：未生成历史数据
